@@ -1,4 +1,5 @@
 library isotope;
 
-export 'isotope_responsive.dart';
-export 'isotope_viewmodels.dart';
+export 'registrar.dart';
+export 'view_models.dart';
+export 'views.dart';
