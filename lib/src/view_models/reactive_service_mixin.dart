@@ -1,10 +1,10 @@
-import 'package:observable_ish/observable_ish.dart';
+import 'package:isotope/reactive.dart';
 
 /// Adds functionality to easily listen to all reactive values in a service.
 mixin ReactiveServiceMixin {
   List<Function> _listeners = List<Function>();
 
-  void listenToReactiveValues(List<RxValue> reactiveValues) {
+  void listenToReactiveValues(List<ReactiveValue> reactiveValues) {
     for (var reactiveValue in reactiveValues) {
       reactiveValue.values.listen((value) {
         for (var listener in _listeners) {
