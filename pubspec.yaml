@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   async: ^2.4.0
   collection: ^1.14.10
+  file_access: ^1.0.3
   flutter_hooks: ^0.9.0
   http: ^0.12.0+2
   location: ^2.3.5
