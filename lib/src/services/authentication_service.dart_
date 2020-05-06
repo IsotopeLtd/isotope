@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isotope/src/models/user.dart';
+import 'package:isotope/src/services/analytics_service.dart';
 import 'package:isotope/utilities.dart';
 import 'package:studio/managers/service_manager.dart';
-import 'package:studio/services/analytics_service.dart';
 import 'package:studio/services/firestore_service.dart';
 
 class AuthenticationService {
