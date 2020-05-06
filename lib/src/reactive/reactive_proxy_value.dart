@@ -1,0 +1,60 @@
+import 'dart:async';
+import 'package:isotope/src/reactive/reactive.dart';
+import 'package:isotope/src/reactive/reactive_value.dart';
+
+class ReactiveProxyValue<T> implements ReactiveValue<T> {
+  ReactiveValueGetter<T> getterProxy;
+  final _change = new StreamController<Change<T>>();
+
+  int _curBatch = 0;
+  ReactiveProxyValue({this.getterProxy}) {
+    _onChange = _change.stream.asBroadcastStream();
+  }
+
+  T get value => getterProxy != null ? getterProxy() : null;
+  set value(T val) {
+    T old = value;
+    if (old == val) return;
+    _change.add(Change<T>(val, old, _curBatch));
+  }
+
+  void setCast(dynamic /* T */ val) => value = val;
+
+  Stream<Change<T>> _onChange;
+
+  Stream<Change<T>> get onChange {
+    _curBatch++;
+    final ret = StreamController<Change<T>>();
+    ret.add(Change<T>(value, null, _curBatch));
+    if (getterProxy != null) {
+      ret.addStream(_onChange.skipWhile((v) => v.batch < _curBatch));
+    } else {
+      ret.addStream(_onChange);
+    }
+    return ret.stream.asBroadcastStream();
+  }
+
+  Stream<T> get values => onChange.map((c) => c.neu);
+
+  void bind(ReactiveValue<T> reactive) {
+    value = reactive.value;
+    reactive.values.listen((v) => value = v);
+  }
+
+  void bindStream(Stream<T> stream) => stream.listen((v) => value = v);
+
+  void bindOrSet(/* T | Stream<T> | Reactive<T> */ other) {
+    if (other is ReactiveValue<T>) {
+      bind(other);
+    } else if (other is Stream<T>) {
+      bindStream(other.cast<T>());
+    } else {
+      value = other;
+    }
+  }
+
+  StreamSubscription<T> listen(ReactiveValueCallback<T> callback) =>
+      values.listen(callback);
+
+  Stream<R> map<R>(R mapper(T data)) => values.map(mapper);
+}
