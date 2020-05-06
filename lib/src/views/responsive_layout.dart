@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:isotope/src/responsive/responsive_breakpoints.dart';
-import 'package:isotope/src/responsive/responsive_builder.dart';
-import 'package:isotope/src/responsive/responsive_device.dart';
+import 'package:isotope/src/views/responsive_breakpoints.dart';
+import 'package:isotope/src/views/responsive_builder.dart';
+import 'package:isotope/src/views/responsive_device.dart';
 
 typedef WidgetBuilder = Widget Function(BuildContext);
 

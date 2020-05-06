@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:isotope/src/responsive/responsive_breakpoints.dart';
-import 'package:isotope/src/responsive/responsive_device.dart';
-import 'package:isotope/src/responsive/screen_info.dart';
+import 'package:isotope/src/views/responsive_breakpoints.dart';
+import 'package:isotope/src/views/responsive_device.dart';
+import 'package:isotope/src/views/screen_info.dart';
 
 /// A widget with a builder that provides you with the sizingInformation.
 /// This widget is used by the ViewportWidget to provide different widget builders.
