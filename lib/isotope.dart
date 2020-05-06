@@ -6,6 +6,7 @@ export 'platform.dart';
 export 'reactive.dart';
 export 'registrar.dart';
 export 'services.dart';
+export 'utilities.dart';
 export 'view_models.dart';
 export 'views.dart';
 export 'widgets.dart';
