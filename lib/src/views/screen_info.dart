@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:isotope/src/responsive/responsive_device.dart';
+import 'package:isotope/src/views/responsive_device.dart';
 
 /// Contains sizing information to make responsive choices for the current screen.
 class ScreenInfo {
