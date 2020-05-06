@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:isotope/src/viewmodels/base_view_model.dart';
+import 'package:isotope/src/view_models/base_view_model.dart';
 
 enum _ViewModelBuilderType { NonReactive, Reactive }
 

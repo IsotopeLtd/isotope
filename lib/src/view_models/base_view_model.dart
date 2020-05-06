@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
-import 'package:isotope/src/viewmodels/reactive_service_mixin.dart';
+import 'package:isotope/src/view_models/reactive_service_mixin.dart';
 
 /// Contains ViewModel functionality for busy state management.
 class BaseViewModel extends ChangeNotifier {

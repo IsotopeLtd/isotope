@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:isotope/src/viewmodels/view_model_builder.dart';
+import 'package:isotope/src/view_models/view_model_builder.dart';
 
 /// A widget that wraps the [ViewModelBuilder] class in a less boiler plate use of 
 /// the widget. Default [reactive] value is true. Can be overriden and set to false.
