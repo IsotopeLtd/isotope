@@ -10,10 +10,10 @@ class Presenter extends ChangeNotifier {
   /// Returns false if not present.
   bool busy(Object object) => _busyStates[object.hashCode] ?? false;
 
-  /// Returns the busy status of the viewmodel.
+  /// Returns the busy status of the presenter.
   bool get isBusy => busy(this);
 
-  /// Marks the viewmodel as busy and calls notify listeners.
+  /// Marks the presenter as busy and calls notify listeners.
   void setBusy(bool value) {
     setBusyForObject(this, value);
   }
@@ -30,13 +30,13 @@ class Presenter extends ChangeNotifier {
   /// Sets the Presenter to busy, runs the future and then sets it 
   /// to not busy when complete.
   Future runBusyFuture(Future busyFuture, {Object busyObject}) async {
-    _setBusyForModelOrObject(true, busyObject: busyObject);
+    _setBusyForPresenterOrObject(true, busyObject: busyObject);
     var value = await busyFuture;
-    _setBusyForModelOrObject(false, busyObject: busyObject);
+    _setBusyForPresenterOrObject(false, busyObject: busyObject);
     return value;
   }
 
-  void _setBusyForModelOrObject(bool value, {Object busyObject}) {
+  void _setBusyForPresenterOrObject(bool value, {Object busyObject}) {
     if (busyObject != null) {
       setBusyForObject(busyObject, value);
     } else {
@@ -74,12 +74,9 @@ class Presenter extends ChangeNotifier {
 /// a reactive service.
 abstract class ReactivePresenter extends Presenter {
   List<ReactiveServiceMixin> _reactiveServices;
-
   List<ReactiveServiceMixin> get reactiveServices;
 
-  ReactivePresenter() {
-    _reactToServices(reactiveServices);
-  }
+  ReactivePresenter() { _reactToServices(reactiveServices); }
 
   void _reactToServices(List<ReactiveServiceMixin> reactiveServices) {
     _reactiveServices = reactiveServices;
@@ -104,12 +101,13 @@ abstract class ReactivePresenter extends Presenter {
 @protected
 class DynamicSourcePresenter<T> extends Presenter {
   bool changeSource = false;
+
   void notifySourceChanged({bool clearOldData = false}) {
     changeSource = true;
   }
 }
 
-class _SingleSourcePresenter<T> extends DynamicSourcePresenter {
+class _SourcePresenter<T> extends DynamicSourcePresenter {
   T _data;
   T get data => _data;
 
@@ -119,20 +117,19 @@ class _SingleSourcePresenter<T> extends DynamicSourcePresenter {
   bool get dataReady => _data != null && !_hasError;
 }
 
-class _MultipleSourcePresenter extends DynamicSourcePresenter {
+class _SourcesPresenter extends DynamicSourcePresenter {
   Map<String, dynamic> _dataMap;
   Map<String, dynamic> get dataMap => _dataMap;
 
   Map<String, bool> _errorMap;
 
   bool hasError(String key) => _errorMap[key] ?? false;
-  bool dataReady(String key) =>
-      _dataMap[key] != null && (_errorMap[key] == null);
+  bool dataReady(String key) => _dataMap[key] != null && (_errorMap[key] == null);
 }
 
-/// Provides functionality for a viewmodel whose sole purpose 
+/// Provides functionality for a presenter whose sole purpose 
 /// it is to fetch data using a future.
-abstract class FuturePresenter<T> extends _SingleSourcePresenter<T> {
+abstract class FuturePresenter<T> extends _SourcePresenter<T> {
   /// The future that fetches the data and sets the view to busy.
   Future<T> futureToRun();
 
@@ -153,9 +150,9 @@ abstract class FuturePresenter<T> extends _SingleSourcePresenter<T> {
   void onError(error) {}
 }
 
-/// Provides functionality for a viewmodel to run and fetch data 
+/// Provides functionality for a presenter to run and fetch data 
 /// using multiple futures.
-abstract class MultipleFuturePresenter extends _MultipleSourcePresenter {
+abstract class FuturesPresenter extends _SourcesPresenter {
   Map<String, Future Function()> get futuresMap;
 
   Completer _futuresCompleter;
@@ -211,10 +208,10 @@ abstract class MultipleFuturePresenter extends _MultipleSourcePresenter {
   void onData(String key) {}
 }
 
-/// Provides functionality for a viewmodel to run and fetch 
+/// Provides functionality for a presenter to run and fetch 
 /// data using multiple streams.
-abstract class MultipleStreamPresenter extends _MultipleSourcePresenter {
-  // Every MultipleStreamPresenter must override streamDataMap.
+abstract class StreamsPresenter extends _SourcesPresenter {
+  // Every StreamsPresenter must override streamDataMap.
   // StreamData requires a stream, but lifecycle events are optional
   // if a lifecyle event is not defined we use the default ones here.
   Map<String, StreamData> get streamsMap;
@@ -308,7 +305,7 @@ abstract class MultipleStreamPresenter extends _MultipleSourcePresenter {
   }
 }
 
-abstract class StreamPresenter<T> extends _SingleSourcePresenter<T> implements DynamicSourcePresenter {
+abstract class StreamPresenter<T> extends _SourcePresenter<T> implements DynamicSourcePresenter {
   /// Stream to listen to.
   Stream<T> get stream;
   @visibleForTesting
@@ -368,7 +365,7 @@ abstract class StreamPresenter<T> extends _SingleSourcePresenter<T> implements D
 
   void onCancel() {}
 
-  /// Called before the data is set for the viewmodel.
+  /// Called before the data is set for the presenter.
   T transformData(T data) { return data; }
 
   @override
@@ -380,7 +377,7 @@ abstract class StreamPresenter<T> extends _SingleSourcePresenter<T> implements D
   }
 }
 
-class StreamData<T> extends _SingleSourcePresenter<T> {
+class StreamData<T> extends _SourcePresenter<T> {
   Stream<T> stream;
 
   /// Called when the new data arrives.
@@ -400,7 +397,7 @@ class StreamData<T> extends _SingleSourcePresenter<T> {
   Function onCancel;
 
   /// Allows you to modify the data before it is set as the 
-  /// new data for the model.
+  /// new data for the presenter.
   ///
   /// This can be used to modify the data if required. 
   /// If nothing is returned the data will not be set.

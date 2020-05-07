@@ -101,16 +101,16 @@ class _PresenterBuilderState<T extends ChangeNotifier> extends State<PresenterBu
       (_presenter as FuturePresenter).runFuture();
     }
 
-    if (_presenter is MultipleFuturePresenter) {
-      (_presenter as MultipleFuturePresenter).runFutures();
+    if (_presenter is FuturesPresenter) {
+      (_presenter as FuturesPresenter).runFutures();
     }
 
     if (_presenter is StreamPresenter) {
       (_presenter as StreamPresenter).initialise();
     }
 
-    if (_presenter is MultipleStreamPresenter) {
-      (_presenter as MultipleStreamPresenter).initialise();
+    if (_presenter is StreamsPresenter) {
+      (_presenter as StreamsPresenter).initialise();
     }
   }
 

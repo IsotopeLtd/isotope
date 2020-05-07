@@ -2,7 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-/// A widget that provides a value passed through a provider as a parameter of the build function.
+/// A widget that provides a value passed through a provider 
+/// as a parameter of the build function.
 abstract class PresenterWidget<T> extends Widget {
   final bool reactive;
 

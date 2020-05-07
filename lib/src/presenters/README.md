@@ -1,6 +1,6 @@
 # Presenters
 
-This architecture aims to provide **common functionalities to make app development easier** as well as code principles to use during development to ensure your code stays maintainable. It uses a View -> Presenter -> Model architecture pattern which provides single-direction view binding from the presenter.
+This architecture aims to provide a commercially proven software architecture and set of code principles/patterns to use during development to ensure your code stays maintainable. It uses a View -> Presenter -> Service -> Model architecture pattern which provides single-direction view binding to a presenter.
 
 ## Installation
 
@@ -21,11 +21,12 @@ import 'package:isotope/presenters.dart';
 
 ## How does it work
 
-The architecture is very simple. It consists of 3 major pieces, everything else is up to your implementation style. These pieces are:
+The architecture is very simple. It consists of 4 major pieces, everything else is up to your implementation style. These pieces are:
 
 - **View**: Shows the UI to the user. Single widgets also qualify as views (for consistency in terminology) a view in this case is not a "Page" it's just a UI representation.
 - **Presenter**: Manages the state of the View, business logic and any other logic as required from user interaction. It does this by making use of the services.
 - **Service**: A wrapper of a single functionality / feature set. This is commonly used to wrap things like showing a dialog, wrapping database functionality, integrating an API, etc.
+- **Model**: Represents data froma  data source. This may be from a database such as Firestore, or data returned by an API. A service is responsible for filling the model which may be consumed by a presenter.
 
 _Optional:_
 - **Manager**: A service that requires other services. This piece serves no particular part in the architecture except for indicating that it has dependencies on other services. It's main purpose is to distinguish between services that depend on other services and ones that don't. It's not a hard rule to follow but will allow for more code separation.
