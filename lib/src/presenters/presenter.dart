@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
-import 'package:isotope/src/view_models/reactive_service_mixin.dart';
+import 'package:isotope/src/presenters/reactive_service_mixin.dart';
 
-/// Contains ViewModel functionality for busy state management.
-class BaseViewModel extends ChangeNotifier {
+/// Contains Presenter functionality for busy state management.
+class Presenter extends ChangeNotifier {
   Map<int, bool> _busyStates = Map<int, bool>();
 
-  /// Returns the busy status for an object if it exists. Returns false if not present.
+  /// Returns the busy status for an object if it exists. 
+  /// Returns false if not present.
   bool busy(Object object) => _busyStates[object.hashCode] ?? false;
 
   /// Returns the busy status of the viewmodel.
@@ -17,14 +18,17 @@ class BaseViewModel extends ChangeNotifier {
     setBusyForObject(this, value);
   }
 
-  /// Sets the busy state for the object equal to the value passed in and notifies listeners.
-  /// If you're using a primitive type the value SHOULD NOT BE CHANGED, since Hashcode uses `==` value.
+  /// Sets the busy state for the object equal to the value 
+  /// passed in and notifies listeners. If you're using a primitive 
+  /// type the value SHOULD NOT BE CHANGED, since Hashcode uses `==` 
+  /// value.
   void setBusyForObject(Object object, bool value) {
     _busyStates[object.hashCode] = value;
     notifyListeners();
   }
 
-  /// Sets the ViewModel to busy, runs the future and then sets it to not busy when complete.
+  /// Sets the Presenter to busy, runs the future and then sets it 
+  /// to not busy when complete.
   Future runBusyFuture(Future busyFuture, {Object busyObject}) async {
     _setBusyForModelOrObject(true, busyObject: busyObject);
     var value = await busyFuture;
@@ -44,12 +48,13 @@ class BaseViewModel extends ChangeNotifier {
   @protected
   StreamData setupStream<T>(
     Stream<T> stream, {
-    onData,
-    onSubscribed,
-    onError,
-    onCancel,
-    transformData,
-  }) {
+      onData,
+      onSubscribed,
+      onError,
+      onCancel,
+      transformData,
+    }
+  ) {
     StreamData<T> streamData = StreamData<T>(
       stream,
       onData: onData,
@@ -58,19 +63,21 @@ class BaseViewModel extends ChangeNotifier {
       onCancel: onCancel,
       transformData: transformData,
     );
+
     streamData.initialise();
 
     return streamData;
   }
 }
 
-/// A [BaseViewModel] that provides functionality to subscribe to a reactive service.
-abstract class ReactiveViewModel extends BaseViewModel {
+/// A [Presenter] that provides functionality to subscribe to 
+/// a reactive service.
+abstract class ReactivePresenter extends Presenter {
   List<ReactiveServiceMixin> _reactiveServices;
 
   List<ReactiveServiceMixin> get reactiveServices;
 
-  ReactiveViewModel() {
+  ReactivePresenter() {
     _reactToServices(reactiveServices);
   }
 
@@ -95,14 +102,14 @@ abstract class ReactiveViewModel extends BaseViewModel {
 }
 
 @protected
-class DynamicSourceViewModel<T> extends BaseViewModel {
+class DynamicSourcePresenter<T> extends Presenter {
   bool changeSource = false;
   void notifySourceChanged({bool clearOldData = false}) {
     changeSource = true;
   }
 }
 
-class _SingleDataSourceViewModel<T> extends DynamicSourceViewModel {
+class _SingleSourcePresenter<T> extends DynamicSourcePresenter {
   T _data;
   T get data => _data;
 
@@ -112,7 +119,7 @@ class _SingleDataSourceViewModel<T> extends DynamicSourceViewModel {
   bool get dataReady => _data != null && !_hasError;
 }
 
-class _MultiDataSourceViewModel extends DynamicSourceViewModel {
+class _MultipleSourcePresenter extends DynamicSourcePresenter {
   Map<String, dynamic> _dataMap;
   Map<String, dynamic> get dataMap => _dataMap;
 
@@ -123,8 +130,9 @@ class _MultiDataSourceViewModel extends DynamicSourceViewModel {
       _dataMap[key] != null && (_errorMap[key] == null);
 }
 
-/// Provides functionality for a viewmodel whose sole purpose it is to fetch data using a future.
-abstract class FutureViewModel<T> extends _SingleDataSourceViewModel<T> {
+/// Provides functionality for a viewmodel whose sole purpose 
+/// it is to fetch data using a future.
+abstract class FuturePresenter<T> extends _SingleSourcePresenter<T> {
   /// The future that fetches the data and sets the view to busy.
   Future<T> futureToRun();
 
@@ -145,8 +153,9 @@ abstract class FutureViewModel<T> extends _SingleDataSourceViewModel<T> {
   void onError(error) {}
 }
 
-/// Provides functionality for a viewmodel to run and fetch data using multiple futures.
-abstract class MultipleFutureViewModel extends _MultiDataSourceViewModel {
+/// Provides functionality for a viewmodel to run and fetch data 
+/// using multiple futures.
+abstract class MultipleFuturePresenter extends _MultipleSourcePresenter {
   Map<String, Future Function()> get futuresMap;
 
   Completer _futuresCompleter;
@@ -156,6 +165,7 @@ abstract class MultipleFutureViewModel extends _MultiDataSourceViewModel {
     if (_errorMap == null) {
       _errorMap = Map<String, bool>();
     }
+
     if (_dataMap == null) {
       _dataMap = Map<String, dynamic>();
     }
@@ -201,18 +211,17 @@ abstract class MultipleFutureViewModel extends _MultiDataSourceViewModel {
   void onData(String key) {}
 }
 
-/// Provides functionality for a viewmodel to run and fetch data using multiple streams.
-abstract class MultipleStreamViewModel extends _MultiDataSourceViewModel {
-  // Every MultipleStreamViewModel must override streamDataMap.
+/// Provides functionality for a viewmodel to run and fetch 
+/// data using multiple streams.
+abstract class MultipleStreamPresenter extends _MultipleSourcePresenter {
+  // Every MultipleStreamPresenter must override streamDataMap.
   // StreamData requires a stream, but lifecycle events are optional
   // if a lifecyle event is not defined we use the default ones here.
   Map<String, StreamData> get streamsMap;
-
   Map<String, StreamSubscription> _streamsSubscriptions;
 
   @visibleForTesting
-  Map<String, StreamSubscription> get streamsSubscriptions =>
-      _streamsSubscriptions;
+  Map<String, StreamSubscription> get streamsSubscriptions => _streamsSubscriptions;
 
   void initialise() {
     _dataMap = Map<String, dynamic>();
@@ -279,9 +288,7 @@ abstract class MultipleStreamViewModel extends _MultiDataSourceViewModel {
   void onSubscribed(String key) {}
   void onError(String key, error) {}
   void onCancel(String key) {}
-  dynamic transformData(String key, data) {
-    return data;
-  }
+  dynamic transformData(String key, data) { return data; }
 
   @override
   @mustCallSuper
@@ -301,14 +308,11 @@ abstract class MultipleStreamViewModel extends _MultiDataSourceViewModel {
   }
 }
 
-abstract class StreamViewModel<T> extends _SingleDataSourceViewModel<T>
-    implements DynamicSourceViewModel {
+abstract class StreamPresenter<T> extends _SingleSourcePresenter<T> implements DynamicSourcePresenter {
   /// Stream to listen to.
   Stream<T> get stream;
-
   @visibleForTesting
   StreamSubscription get streamSubscription => _streamSubscription;
-
   StreamSubscription _streamSubscription;
 
   @override
@@ -330,8 +334,7 @@ abstract class StreamViewModel<T> extends _SingleDataSourceViewModel<T>
         _hasError = false;
         notifyListeners();
         // Extra security in case transformData is not sent.
-        var interceptedData =
-            transformData == null ? incomingData : transformData(incomingData);
+        var interceptedData = transformData == null ? incomingData : transformData(incomingData);
 
         if (interceptedData != null) {
           _data = interceptedData;
@@ -366,9 +369,7 @@ abstract class StreamViewModel<T> extends _SingleDataSourceViewModel<T>
   void onCancel() {}
 
   /// Called before the data is set for the viewmodel.
-  T transformData(T data) {
-    return data;
-  }
+  T transformData(T data) { return data; }
 
   @override
   void dispose() {
@@ -379,13 +380,14 @@ abstract class StreamViewModel<T> extends _SingleDataSourceViewModel<T>
   }
 }
 
-class StreamData<T> extends _SingleDataSourceViewModel<T> {
+class StreamData<T> extends _SingleSourcePresenter<T> {
   Stream<T> stream;
 
   /// Called when the new data arrives.
   ///
-  /// notifyListeners is called before this so no need to call in here unless you are
-  /// running additional logic and setting a separate value.
+  /// notifyListeners is called before this so no need to call in 
+  /// here unless you are running additional logic and setting a 
+  /// separate value.
   Function onData;
 
   /// Called after the stream has been listened to.
@@ -397,11 +399,13 @@ class StreamData<T> extends _SingleDataSourceViewModel<T> {
   /// Called when the stream is canceled.
   Function onCancel;
 
-  /// Allows you to modify the data before it is set as the new data for the model.
+  /// Allows you to modify the data before it is set as the 
+  /// new data for the model.
   ///
-  /// This can be used to modify the data if required. If nothing is returned the data
-  /// will not be set.
+  /// This can be used to modify the data if required. 
+  /// If nothing is returned the data will not be set.
   Function transformData;
+
   StreamData(
     this.stream, {
     this.onData,
@@ -410,13 +414,14 @@ class StreamData<T> extends _SingleDataSourceViewModel<T> {
     this.onCancel,
     this.transformData,
   });
+
   StreamSubscription _streamSubscription;
 
   void initialise() {
-    _streamSubscription = stream.listen(
-      (incomingData) {
+    _streamSubscription = stream.listen((incomingData) {
         _hasError = false;
         notifyListeners();
+
         // Extra security in case transformData is not passed.
         var interceptedData =
             transformData == null ? incomingData : transformData(incomingData);
