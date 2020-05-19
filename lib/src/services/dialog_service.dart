@@ -1,53 +1,137 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
-import 'package:isotope/src/models/dialog_request.dart';
-import 'package:isotope/src/models/dialog_response.dart';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:isotope/src/models/dialog_response.dart';
+import 'package:isotope/src/widgets/platform_dialog.dart';
+
+enum DialogPlatform {
+  Cupertino,
+  Material,
+  Custom,
+}
+
+/// A DialogService that uses the Get package to show dialogs
 class DialogService {
-  GlobalKey<NavigatorState> _dialogNavigationKey = GlobalKey<NavigatorState>();
-  Function(DialogRequest) _showDialogListener;
   Completer<DialogResponse> _dialogCompleter;
 
-  GlobalKey<NavigatorState> get dialogNavigationKey => _dialogNavigationKey;
+  // TODO: Create a dialog UI registration factory that will allow users to register
+  // dialogs to be built along with keys. the user should then be able to show the dialog
+  // using that key.
 
-  /// Registers a callback function. Typically to show the dialog
-  void registerDialogListener(Function(DialogRequest) showDialogListener) {
-    _showDialogListener = showDialogListener;
-  }
-
-  /// Calls the dialog listener and returns a Future that will wait for dialogComplete.
+  /// Shows a dialog to the user
+  ///
+  /// It will show a platform specific dialog by default. This can be changed by setting [dialogPlatform]
   Future<DialogResponse> showDialog({
     String title,
     String description,
-    String buttonTitle = 'OK',
+    String cancelText,
+    String confirmText = 'Ok',
+
+    /// Indicates which [DialogPlatform] to show.
+    ///
+    /// When not set a Platform specific dialog will be shown
+    DialogPlatform dialogPlatform,
   }) {
     _dialogCompleter = Completer<DialogResponse>();
-    _showDialogListener(DialogRequest(
+
+    if (dialogPlatform != null) {
+      _showDialog(
+          title: title,
+          description: description,
+          cancelText: cancelText,
+          confirmText: confirmText,
+          dialogPlatform: dialogPlatform);
+    } else {
+      var _dialogType = GetPlatform.isAndroid
+          ? DialogPlatform.Material
+          : DialogPlatform.Cupertino;
+      _showDialog(
+          title: title,
+          description: description,
+          cancelText: cancelText,
+          confirmText: confirmText,
+          dialogPlatform: _dialogType);
+    }
+
+    return _dialogCompleter.future;
+  }
+
+  Future _showDialog({
+    String title,
+    String description,
+    String cancelText,
+    String confirmText,
+    DialogPlatform dialogPlatform,
+  }) {
+    var isConfirmationDialog = cancelText != null;
+    return Get.dialog(
+      PlatformDialog(
+        dialogPlatform: dialogPlatform,
+        title: title,
+        content: description,
+        actions: <Widget>[
+          if (isConfirmationDialog)
+            PlatformButton(
+              dialogPlatform: dialogPlatform,
+              text: cancelText,
+              isCancelButton: true,
+              onPressed: () {
+                if (!_dialogCompleter.isCompleted)
+                  completeDialog(
+                    DialogResponse(
+                      confirmed: false,
+                    ),
+                  );
+              },
+            ),
+          PlatformButton(
+            dialogPlatform: dialogPlatform,
+            text: confirmText,
+            onPressed: () {
+              if (!_dialogCompleter.isCompleted)
+                completeDialog(
+                  DialogResponse(
+                    confirmed: true,
+                  ),
+                );
+            },
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  /// Shows a confirmation dialog with title and description
+  Future<DialogResponse> showConfirmationDialog({
+    String title,
+    String description,
+    String cancelText = 'Cancel',
+    String confirmText = 'Ok',
+
+    /// Indicates which [DialogPlatform] to show.
+    ///
+    /// When not set a Platform specific dialog will be shown
+    DialogPlatform dialogPlatform,
+  }) {
+    _dialogCompleter = Completer<DialogResponse>();
+
+    showDialog(
       title: title,
       description: description,
-      buttonTitle: buttonTitle,
-    ));
+      confirmText: confirmText,
+      cancelText: cancelText,
+      dialogPlatform: dialogPlatform,
+    );
+
     return _dialogCompleter.future;
   }
 
-  /// Shows a confirmation dialog
-  Future<DialogResponse> showConfirmationDialog(
-      {String title,
-      String description,
-      String confirmationTitle = 'OK',
-      String cancelTitle = 'Cancel'}) {
-    _dialogCompleter = Completer<DialogResponse>();
-    _showDialogListener(DialogRequest(
-        title: title,
-        description: description,
-        buttonTitle: confirmationTitle,
-        cancelTitle: cancelTitle));
-    return _dialogCompleter.future;
-  }
-
-  /// Completes the _dialogCompleter to resume the Future's execution call
-  void dialogComplete(DialogResponse response) {
-    _dialogNavigationKey.currentState.pop();
+  /// Completes the dialog and passes the [response] to the caller
+  void completeDialog(DialogResponse response) {
+    Get.back();
     _dialogCompleter.complete(response);
     _dialogCompleter = null;
   }
