@@ -114,6 +114,9 @@ class _SourcePresenter<T> extends DynamicSourcePresenter {
   bool _hasError;
   bool get hasError => _hasError;
 
+  dynamic _error;
+  dynamic get error => _error;
+  
   bool get dataReady => _data != null && !_hasError;
 }
 
@@ -122,6 +125,9 @@ class _SourcesPresenter extends DynamicSourcePresenter {
   Map<String, dynamic> get dataMap => _dataMap;
 
   Map<String, bool> _errorMap;
+
+  Map<String, dynamic> _errors;
+  dynamic getError(String key) => _errors[key];
 
   bool hasError(String key) => _errorMap[key] ?? false;
   bool dataReady(String key) => _dataMap[key] != null && (_errorMap[key] == null);
