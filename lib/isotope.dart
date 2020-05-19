@@ -1,7 +1,6 @@
 library isotope;
 
 export 'hooks.dart';
-export 'managers.dart';
 export 'models.dart';
 export 'platform.dart';
 export 'presenters.dart';
