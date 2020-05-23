@@ -43,7 +43,7 @@ class _FormGeneratorState extends State<FormGenerator> {
     });
   }
 
-  List<Widget> jsonToForm() {
+  List<Widget> builder() {
     List<Widget> listWidget = new List<Widget>();
 
     for (var item in formItems) {
@@ -70,7 +70,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                   return null;
                 }
                 if (value.isEmpty) {
-                  return 'Please ${item['title']} cannot be empty';
+                  return '${item['title']} cannot be empty';
                 }
                 return null;
               },
@@ -106,7 +106,7 @@ class _FormGeneratorState extends State<FormGenerator> {
                 return null;
               }
               if (value == null) {
-                return 'Please ${item['title']} cannot be empty';
+                return '${item['title']} cannot be empty';
               }
               return null;
             },
@@ -159,7 +159,7 @@ class _FormGeneratorState extends State<FormGenerator> {
               controller: TextEditingController(text: _datevalueMap[item["title"]]),
               validator: (String value) {
                 if (value.isEmpty) {
-                  return 'Please  cannot be empty';
+                  return '${item['title']} cannot be empty';
                 }
                 return null;
               },
@@ -259,7 +259,7 @@ class _FormGeneratorState extends State<FormGenerator> {
       padding: EdgeInsets.all(30),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: jsonToForm(),
+        children: builder(),
       ),
     );
   }
