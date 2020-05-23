@@ -15,13 +15,15 @@ class FormGenerator extends StatefulWidget {
 
 class _FormGeneratorState extends State<FormGenerator> {
   final dynamic formItems;
+  final Map<String, dynamic> formResults = {};
+
+  Map<String, dynamic> radioValueMap = {};
+  Map<String, String> dropDownMap = {};
+  Map<String, String> _datevalueMap = {};
+  Map<String, bool> switchValueMap = {};
 
   Map _initValue;
   _FormGeneratorState(this.formItems);
-
-  void _handleChanged() {
-    widget.onChanged(formResults);
-  }
 
   @override
   void initState() {
@@ -30,20 +32,28 @@ class _FormGeneratorState extends State<FormGenerator> {
     super.initState();
   }
 
-  final Map<String, dynamic> formResults = {};
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+      padding: EdgeInsets.all(30),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: _buildForm(),
+      ),
+    );
+  }
 
-  Map<String, dynamic> radioValueMap = {};
-  Map<String, String> dropDownMap = {};
-  Map<String, String> _datevalueMap = {};
-  Map<String, bool> switchValueMap = {};
+  void _handleChanged() {
+    widget.onChanged(formResults);
+  }
 
-  void updateSwitchValue(dynamic item, bool value) {
+  void _updateSwitchValue(dynamic item, bool value) {
     setState(() {
       switchValueMap[item] = value;
     });
   }
 
-  List<Widget> builder() {
+  List<Widget> _buildForm() {
     List<Widget> listWidget = new List<Widget>();
 
     for (var item in formItems) {
@@ -240,7 +250,7 @@ class _FormGeneratorState extends State<FormGenerator> {
               Switch(
                 value: switchValueMap["${item["title"]}"],
                 onChanged: (bool value) {
-                  updateSwitchValue(item["title"], value);
+                  _updateSwitchValue(item["title"], value);
                   formResults[item["title"]] = value;
                   _handleChanged();
                 }
@@ -251,16 +261,5 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
     }
     return listWidget;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Container(
-      padding: EdgeInsets.all(30),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: builder(),
-      ),
-    );
   }
 }
