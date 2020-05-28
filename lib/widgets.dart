@@ -1,5 +1,6 @@
 library widgets;
 
+export 'src/widgets/avatar.dart';
 export 'src/widgets/busy_button.dart';
 export 'src/widgets/busy_overlay.dart';
 export 'src/widgets/centered_view.dart';
@@ -7,6 +8,10 @@ export 'src/widgets/expansion_list.dart';
 export 'src/widgets/input_field.dart';
 export 'src/widgets/note_text.dart';
 export 'src/widgets/notification.dart';
+export 'src/widgets/platform_alert_dialog.dart';
+export 'src/widgets/platform_exception_alert_dialog.dart';
+export 'src/widgets/platform_widget.dart';
+export 'src/widgets/segmented_control.dart';
 export 'src/widgets/text_link.dart';
 export 'src/widgets/translate_on_hover.dart';
 
