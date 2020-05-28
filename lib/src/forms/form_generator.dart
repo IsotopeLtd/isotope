@@ -221,7 +221,7 @@ class _FormGeneratorState extends State<FormGenerator> {
               children: <Widget>[
                 new Expanded(child: new Text(item['items'][i])),
                 new Radio<dynamic>(
-                    hoverColor: Colors.red,
+                    // hoverColor: Colors.red,
                     value: item['items'][i],
                     groupValue: radioValueMap["${item["title"]}"],
                     onChanged: (dynamic value) {
