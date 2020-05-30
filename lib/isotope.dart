@@ -4,6 +4,7 @@ export 'extensions.dart';
 export 'forms.dart';
 export 'hooks.dart';
 export 'models.dart';
+export 'notifier.dart';
 export 'platform.dart';
 export 'presenters.dart';
 export 'reactive.dart';
