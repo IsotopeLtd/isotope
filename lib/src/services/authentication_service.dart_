@@ -1,3 +1,7 @@
+// This has been extrapolated into separate libraries:
+// See https://github.com/IsotopeLtd/isotope_auth
+// TODO Remove when analytics hooks are included in above
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isotope/src/models/user.dart';
