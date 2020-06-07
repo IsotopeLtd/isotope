@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:isotope/platform.dart';
 import 'package:isotope/src/widgets/platform_widget.dart';
-import 'package:isotope/src/constants/keys.dart';
 
 class PlatformAlertDialog extends PlatformWidget {
   PlatformAlertDialog({
@@ -57,7 +56,7 @@ class PlatformAlertDialog extends PlatformWidget {
         PlatformAlertDialogAction(
           child: Text(
             cancelActionText,
-            key: Key(Keys.alertCancel),
+            key: Key('ALERT_CANCEL_KEY'),
           ),
           onPressed: () => Navigator.of(context).pop(false),
         ),
@@ -67,7 +66,7 @@ class PlatformAlertDialog extends PlatformWidget {
       PlatformAlertDialogAction(
         child: Text(
           defaultActionText,
-          key: Key(Keys.alertDefault),
+          key: Key('ALERT_DEFAULT_KEY'),
         ),
         onPressed: () => Navigator.of(context).pop(true),
       ),
