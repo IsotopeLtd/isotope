@@ -20,10 +20,10 @@ class _FormGeneratorState extends State<FormGenerator> {
   final dynamic formItems;
   final Map<String, dynamic> formResults = {};
 
-  Map<String, dynamic> radioValueMap = {};
-  Map<String, String> dropDownMap = {};
+  Map<String, dynamic> _radioValueMap = {};
+  Map<String, String> _dropDownMap = {};
   Map<String, String> _datevalueMap = {};
-  Map<String, bool> booleanValueMap = {};
+  Map<String, bool> _booleanValueMap = {};
 
   Map _values;
   _FormGeneratorState(this.formItems);
@@ -52,7 +52,7 @@ class _FormGeneratorState extends State<FormGenerator> {
 
   void _updateBooleanMapValue(dynamic item, bool value) {
     setState(() {
-      booleanValueMap[item] = value;
+      _booleanValueMap[item] = value;
     });
   }
 
@@ -160,12 +160,12 @@ class _FormGeneratorState extends State<FormGenerator> {
               }
               return null;
             },
-            value: dropDownMap[item['name']],
+            value: _dropDownMap[item['name']],
             isExpanded: true,
             style: Theme.of(context).textTheme.subtitle1,
             onChanged: (String newValue) {
               setState(() {
-                dropDownMap[item['name']] = newValue;
+                _dropDownMap[item['name']] = newValue;
                 formResults[item['name']] = newValue.trim();
               });
               _handleChanged();
@@ -238,10 +238,10 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
 
       if (item['type'] == 'radio') {
-        radioValueMap["${item['name']}"] =
-            radioValueMap["${item['name']}"] == null
+        _radioValueMap["${item['name']}"] =
+            _radioValueMap["${item['name']}"] == null
                 ? 'none'
-                : radioValueMap["${item['name']}"];
+                : _radioValueMap["${item['name']}"];
 
         listWidget.add(
           new Container(
@@ -264,10 +264,10 @@ class _FormGeneratorState extends State<FormGenerator> {
                 new Radio<dynamic>(
                     // hoverColor: Colors.red,
                     value: item['items'][i],
-                    groupValue: radioValueMap["${item['name']}"],
+                    groupValue: _radioValueMap["${item['name']}"],
                     onChanged: (dynamic value) {
                       setState(() {
-                        radioValueMap["${item['name']}"] = value;
+                        _radioValueMap["${item['name']}"] = value;
                       });
                       formResults[item['name']] = value;
                       _handleChanged();
@@ -279,9 +279,9 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
 
       if (item['type'] == 'checkbox') {
-        if (booleanValueMap["${item['name']}"] == null) {
+        if (_booleanValueMap["${item['name']}"] == null) {
           setState(() {
-            booleanValueMap["${item['name']}"] = false;
+            _booleanValueMap["${item['name']}"] = false;
           });
         }
         listWidget.add(
@@ -289,7 +289,7 @@ class _FormGeneratorState extends State<FormGenerator> {
             children: <Widget>[
               new Expanded(child: new Text(item['label'])),
               Checkbox(
-                value: booleanValueMap["${item['name']}"],
+                value: _booleanValueMap["${item['name']}"],
                 onChanged: (bool value) {
                   _updateBooleanMapValue(item['name'], value);
                   formResults[item['name']] = value;
@@ -302,9 +302,9 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
 
       if (item['type'] == 'switch') {
-        if (booleanValueMap["${item['name']}"] == null) {
+        if (_booleanValueMap["${item['name']}"] == null) {
           setState(() {
-            booleanValueMap["${item['name']}"] = false;
+            _booleanValueMap["${item['name']}"] = false;
           });
         }
         listWidget.add(
@@ -312,7 +312,7 @@ class _FormGeneratorState extends State<FormGenerator> {
             children: <Widget>[
               new Expanded(child: new Text(item['label'])),
               Switch(
-                value: booleanValueMap["${item['name']}"],
+                value: _booleanValueMap["${item['name']}"],
                 onChanged: (bool value) {
                   _updateBooleanMapValue(item['name'], value);
                   formResults[item['name']] = value;
