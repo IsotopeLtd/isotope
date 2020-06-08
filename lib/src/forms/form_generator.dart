@@ -328,7 +328,7 @@ class _FormGeneratorState extends State<FormGenerator> {
   }
 
   List<TextInputFormatter> _determineFormatters(String type, String length) {
-    List<TextInputFormatter> formatters;
+    List<TextInputFormatter> formatters = new List<TextInputFormatter>();
     int maxLength;
 
     if (length != null) {
