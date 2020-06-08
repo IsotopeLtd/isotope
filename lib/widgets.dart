@@ -11,6 +11,7 @@ export 'src/widgets/notification.dart';
 export 'src/widgets/platform_alert_dialog.dart';
 export 'src/widgets/platform_exception_alert_dialog.dart';
 export 'src/widgets/platform_widget.dart';
+export 'src/widgets/scrollable_navigation_rail.dart';
 export 'src/widgets/segmented_control.dart';
 export 'src/widgets/text_link.dart';
 export 'src/widgets/translate_on_hover.dart';
