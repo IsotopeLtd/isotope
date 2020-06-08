@@ -357,6 +357,8 @@ class _FormGeneratorState extends State<FormGenerator> {
       case 'phone':
         formatters.add(WhitelistingTextInputFormatter.digitsOnly);
         break;
+      default:
+        return null;
     }
 
     return formatters;
