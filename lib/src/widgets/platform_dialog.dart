@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:isotope/services.dart';
 
-const EdgeInsets _defaultInsetPadding = EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0);
+// const EdgeInsets _defaultInsetPadding = EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0);
 const TextStyle _defaultTextStyle = TextStyle(color: Colors.black);
 const TextStyle _cancelTextStyle = TextStyle(color: Colors.red);
 
