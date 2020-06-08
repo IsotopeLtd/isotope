@@ -1,16 +1,19 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:isotope/src/formatters/credit_card_number_input_formatter.dart';
+import 'package:isotope/src/formatters/date_input_formatter.dart';
+import 'package:isotope/src/formatters/thousands_number_input_formatter.dart';
 
 class FormGenerator extends StatefulWidget {
-  final String form;
+  final String schema;
   final ValueChanged<Map> onChanged;
-  final Map initValue;
+  final Map values;
 
-  FormGenerator({@required this.form, @required this.onChanged, this.initValue});
+  FormGenerator({@required this.schema, @required this.onChanged, this.values});
 
   @override
-  _FormGeneratorState createState() => _FormGeneratorState(json.decode(form));
+  _FormGeneratorState createState() => _FormGeneratorState(json.decode(schema));
 }
 
 class _FormGeneratorState extends State<FormGenerator> {
@@ -20,15 +23,15 @@ class _FormGeneratorState extends State<FormGenerator> {
   Map<String, dynamic> radioValueMap = {};
   Map<String, String> dropDownMap = {};
   Map<String, String> _datevalueMap = {};
-  Map<String, bool> switchValueMap = {};
+  Map<String, bool> booleanValueMap = {};
 
-  Map _initValue;
+  Map _values;
   _FormGeneratorState(this.formItems);
 
   @override
   void initState() {
-    _initValue = widget.initValue;
-    print(_initValue);
+    _values = widget.values;
+    print(_values);
     super.initState();
   }
 
@@ -47,9 +50,9 @@ class _FormGeneratorState extends State<FormGenerator> {
     widget.onChanged(formResults);
   }
 
-  void _updateSwitchValue(dynamic item, bool value) {
+  void _updateBooleanMapValue(dynamic item, bool value) {
     setState(() {
-      switchValueMap[item] = value;
+      booleanValueMap[item] = value;
     });
   }
 
@@ -58,36 +61,73 @@ class _FormGeneratorState extends State<FormGenerator> {
 
     for (var item in formItems) {
       if (item['type'] == 'text' ||
-          item['type'] == 'integer' ||
-          item['type'] == "password" ||
-          item['type'] == "multiline") {
+          item['type'] == 'password' ||
+          item['type'] == 'creditcard' ||
+          item['type'] == 'email' ||
+          item['type'] == 'phone' ||
+          item['type'] == 'decimal' ||
+          item['type'] == 'integer') {
         listWidget.add(
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: _initValue != null ? _initValue[item["title"]] : null,
+              initialValue: _values != null ? _values[item['name']] : null,
               autofocus: false,
               onChanged: (String value) {
-                formResults[item["title"]] = value;
+                formResults[item['name']] = value;
                 _handleChanged();
               },
-              inputFormatters: item['type'] == 'integer'
-                  ? [WhitelistingTextInputFormatter(RegExp('[0-9]'))]
-                  : null,
-              keyboardType: item['type'] == 'integer' ? TextInputType.number : null,
+              inputFormatters: _determineFormatters(item['type'], item['length']),
+              keyboardType: _determineKeyboard(item['type']),
               validator: (String value) {
                 if (item['required'] == 'no') {
                   return null;
                 }
                 if (value.isEmpty) {
-                  return '${item['title']} cannot be empty';
+                  return '${item['name']} cannot be empty';
                 }
                 return null;
               },
-              maxLines: item['type'] == "multiline" ? 10 : 1,
-              obscureText: item['type'] == "password" ? true : false,
+              maxLines: 1,
+              obscureText: _determineObscurity(item['type'], item['obscure']),
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 0),
+                labelText: item['label'],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5.0)
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      if (item['type'] == 'multiline') {
+        listWidget.add(
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 10.0),
+            child: TextFormField(
+              initialValue: _values != null ? _values[item['name']] : null,
+              autofocus: false,
+              onChanged: (String value) {
+                formResults[item['name']] = value;
+                _handleChanged();
+              },
+              inputFormatters: _determineFormatters(item['type'], item['length']),
+              keyboardType: _determineKeyboard(item['type']),
+              validator: (String value) {
+                if (item['required'] == 'no') {
+                  return null;
+                }
+                if (value.isEmpty) {
+                  return '${item['name']} cannot be empty';
+                }
+                return null;
+              },
+              maxLines: item['lines'] != null ? int.parse(item['lines']) : 10,
+              obscureText: _determineObscurity(item['type'], item['obscure']),
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 0),
                 labelText: item['label'],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5.0)
@@ -110,23 +150,23 @@ class _FormGeneratorState extends State<FormGenerator> {
                 borderRadius: BorderRadius.circular(5.0)
               ),
             ),
-            hint: Text('Select ${item['title']}'),
+            hint: Text('Select ${item['name']}'),
             validator: (String value) {
               if (item['required'] == 'no') {
                 return null;
               }
               if (value == null) {
-                return '${item['title']} cannot be empty';
+                return '${item['name']} cannot be empty';
               }
               return null;
             },
-            value: dropDownMap[item["title"]],
+            value: dropDownMap[item['name']],
             isExpanded: true,
             style: Theme.of(context).textTheme.subtitle1,
             onChanged: (String newValue) {
               setState(() {
-                dropDownMap[item["title"]] = newValue;
-                formResults[item["title"]] = newValue.trim();
+                dropDownMap[item['name']] = newValue;
+                formResults[item['name']] = newValue.trim();
               });
               _handleChanged();
             },
@@ -155,7 +195,7 @@ class _FormGeneratorState extends State<FormGenerator> {
             },
           );
           if (picked != null) {
-            setState(() => _datevalueMap[item["title"]] = picked.toString().substring(0, 10));
+            setState(() => _datevalueMap[item['name']] = picked.toString().substring(0, 10));
           }
         }
 
@@ -163,13 +203,14 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: _initValue != null ? _initValue[item["title"]] : null,
+              initialValue: _values != null ? _values[item['name']] : null,
               autofocus: false,
               readOnly: true,
-              controller: TextEditingController(text: _datevalueMap[item["title"]]),
+              controller: TextEditingController(text: _datevalueMap[item['name']]),
+              inputFormatters: _determineFormatters(item['type'], null),
               validator: (String value) {
                 if (value.isEmpty) {
-                  return '${item['title']} cannot be empty';
+                  return '${item['name']} cannot be empty';
                 }
                 return null;
               },
@@ -178,12 +219,12 @@ class _FormGeneratorState extends State<FormGenerator> {
               },
               onTap: () async {
                 await _selectDate();
-                formResults[item["title"]] = _datevalueMap[item["title"]];
+                formResults[item['name']] = _datevalueMap[item['name']];
                 _handleChanged();
               },
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                labelText: item["label"],
+                labelText: item['label'],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5.0)
                 ),
@@ -197,10 +238,10 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
 
       if (item['type'] == 'radio') {
-        radioValueMap["${item["title"]}"] =
-            radioValueMap["${item["title"]}"] == null
-                ? 'lost'
-                : radioValueMap["${item["title"]}"];
+        radioValueMap["${item['name']}"] =
+            radioValueMap["${item['name']}"] == null
+                ? 'none'
+                : radioValueMap["${item['name']}"];
 
         listWidget.add(
           new Container(
@@ -223,12 +264,12 @@ class _FormGeneratorState extends State<FormGenerator> {
                 new Radio<dynamic>(
                     // hoverColor: Colors.red,
                     value: item['items'][i],
-                    groupValue: radioValueMap["${item["title"]}"],
+                    groupValue: radioValueMap["${item['name']}"],
                     onChanged: (dynamic value) {
                       setState(() {
-                        radioValueMap["${item["title"]}"] = value;
+                        radioValueMap["${item['name']}"] = value;
                       });
-                      formResults[item["title"]] = value;
+                      formResults[item['name']] = value;
                       _handleChanged();
                     })
               ],
@@ -237,21 +278,44 @@ class _FormGeneratorState extends State<FormGenerator> {
         }
       }
 
-      if (item['type'] == 'switch') {
-        if (switchValueMap["${item["title"]}"] == null) {
+      if (item['type'] == 'checkbox') {
+        if (booleanValueMap["${item['name']}"] == null) {
           setState(() {
-            switchValueMap["${item["title"]}"] = false;
+            booleanValueMap["${item['name']}"] = false;
           });
         }
         listWidget.add(
           Row(
             children: <Widget>[
-              new Expanded(child: new Text(item["label"])),
-              Switch(
-                value: switchValueMap["${item["title"]}"],
+              new Expanded(child: new Text(item['label'])),
+              Checkbox(
+                value: booleanValueMap["${item['name']}"],
                 onChanged: (bool value) {
-                  _updateSwitchValue(item["title"], value);
-                  formResults[item["title"]] = value;
+                  _updateBooleanMapValue(item['name'], value);
+                  formResults[item['name']] = value;
+                  _handleChanged();
+                }
+              ),
+            ],
+          )
+        );
+      }
+
+      if (item['type'] == 'switch') {
+        if (booleanValueMap["${item['name']}"] == null) {
+          setState(() {
+            booleanValueMap["${item['name']}"] = false;
+          });
+        }
+        listWidget.add(
+          Row(
+            children: <Widget>[
+              new Expanded(child: new Text(item['label'])),
+              Switch(
+                value: booleanValueMap["${item['name']}"],
+                onChanged: (bool value) {
+                  _updateBooleanMapValue(item['name'], value);
+                  formResults[item['name']] = value;
                   _handleChanged();
                 }
               ),
@@ -261,5 +325,86 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
     }
     return listWidget;
+  }
+
+  List<TextInputFormatter> _determineFormatters(String type, String length) {
+    List<TextInputFormatter> formatters;
+    int maxLength;
+
+    if (length != null) {
+      maxLength = int.parse(length);
+    }
+
+    switch(type) {
+      case 'integer':
+        formatters.add(ThousandsNumberInputFormatter());
+        if (maxLength != null) {
+          formatters.add(LengthLimitingTextInputFormatter(maxLength));
+        } 
+        break;
+      case 'decimal':
+        formatters.add(ThousandsNumberInputFormatter(allowFraction: true));
+        if (maxLength != null) {
+          formatters.add(LengthLimitingTextInputFormatter(maxLength));
+        } 
+        break;
+      case 'creditcard':
+        formatters.add(CreditCardNumberInputFormatter());
+        break;
+      case 'date':
+        formatters.add(DateInputFormatter());
+        break;
+      case 'phone':
+        formatters.add(WhitelistingTextInputFormatter.digitsOnly);
+        break;
+    }
+
+    return formatters;
+  }
+
+  TextInputType _determineKeyboard(String type) {
+    TextInputType textInputType;
+
+    switch(type) {
+      case 'creditcard':
+        textInputType = TextInputType.number;
+        break;
+      case 'email':
+        textInputType = TextInputType.emailAddress;
+        break;
+      case 'multiline':
+        textInputType = TextInputType.multiline;
+        break;
+      case 'phone':
+        textInputType = TextInputType.phone;
+        break;
+      case 'url':
+        textInputType = TextInputType.url;
+        break;
+      case 'integer':
+        textInputType = TextInputType.number;
+        break;
+      case 'decimal':
+        textInputType = TextInputType.numberWithOptions(decimal: true);
+        break;
+      case 'date':
+        textInputType = TextInputType.datetime;
+        break;
+      default:
+        textInputType = null;
+        break;
+    }
+
+    return textInputType;
+  }
+
+  bool _determineObscurity(String type, String obscure) {
+    bool obscurity = false;
+
+    if (type == 'password' || obscure == 'yes') {
+      obscurity = true;
+    }
+
+    return obscurity;
   }
 }
