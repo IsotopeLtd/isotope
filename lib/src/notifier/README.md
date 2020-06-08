@@ -451,3 +451,11 @@ NotifierHelper.createAction({message, title, duration flatButton});
 NotifierHelper.createLoading({message,linearProgressIndicator, title, duration, progressIndicatorController, progressIndicatorBackgroundColor});
 NotifierHelper.createInputNotifier({textForm});
 ```
+
+## License
+
+This library is available as open source under the terms of the MIT License.
+
+## Copyright
+
+Copyright © 2020 Jurgen Jocubeit
