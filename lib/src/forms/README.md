@@ -339,7 +339,7 @@ String schema = json.encode([
 
 ### Forms
 
-The `FormGenerator` class accepts a `schema` definition as a `String` and a Map 
+The `FormGenerator` class accepts a `schema` and an optional map of `values`. The schema should be passed as a `String` and the values as a `Map`.
 
 Example:
 
@@ -357,28 +357,28 @@ class _DynamicFormState extends State<DynamicForm> {
   // Dynamic response to store your form data:
   dynamic response;
 
-  // Set the formkey for validation:
+  // Set the form key for validation:
   var _formkey = GlobalKey<FormState>();
 
-  // Define the forms fields as encode as a string:
-  String schema = json.encode([
+  // Define the forms fields as encode as a String:
+  String _schema = json.encode([
     {
       'name': 'Name',
       'type': 'text',
       'label': 'Your full name',
       'required': 'yes',
-      'length': '40'
+      'length': '40',
     },
     {
       'name': 'dob',
       'type': 'date',
       'label': 'Date of birth',
-      'required': 'yes'
+      'required': 'yes',
     },
   ]);
 
-  // Map some default initial values:
-  Map values = { 
+  // Define some default initial values as a Map:
+  Map _values = { 
     'name': 'Fred Flintstone', 
     'dob': '1970-02-01', 
   }
@@ -394,8 +394,8 @@ class _DynamicFormState extends State<DynamicForm> {
           key: _formkey, // add the formkey here
           child: Column(children: <Widget>[
             FormGenerator(
-              schema: schema, // add the schema here
-              values: values, // add the initial value map here
+              schema: _schema, // add the schema here
+              values: _values, // add the initial value map here
               onChanged: (dynamic value) {
                 setState(() {
                   this.response = value;
@@ -408,7 +408,7 @@ class _DynamicFormState extends State<DynamicForm> {
                 if (_formkey.currentState.validate()) {
                   print(this.response.toString());
                 }
-              }
+              },
             ),
           ]),
         ),
