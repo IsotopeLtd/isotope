@@ -127,7 +127,7 @@ class _FormGeneratorState extends State<FormGenerator> {
               maxLines: item['lines'] != null ? int.parse(item['lines']) : 10,
               obscureText: _determineObscurity(item['type'], item['obscure']),
               decoration: InputDecoration(
-                contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 0),
+                contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                 labelText: item['label'],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5.0)
