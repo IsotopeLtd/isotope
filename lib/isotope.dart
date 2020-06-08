@@ -1,6 +1,7 @@
 library isotope;
 
 export 'extensions.dart';
+export 'formatters.dart';
 export 'forms.dart';
 export 'hooks.dart';
 export 'models.dart';
