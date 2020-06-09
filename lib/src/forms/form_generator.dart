@@ -18,7 +18,6 @@ class FormGenerator extends StatefulWidget {
 class _FormGeneratorState extends State<FormGenerator> {
   final dynamic formFields;
   final Map<String, dynamic> formResults = {};
-  final Map<String, dynamic> formValues = new Map<String, bool>();
 
   Map<String, dynamic> _radioValueMap = {};
   Map<String, String> _selectValueMap = {};
@@ -29,8 +28,7 @@ class _FormGeneratorState extends State<FormGenerator> {
 
   @override
   void initState() {
-    formValues.addAll(widget.values);
-    formValues.forEach((key, value) {
+    widget.values.forEach((key, value) {
       var field = formFields[key];
       switch(field['type']) {
         case FormFieldType.CheckboxField:
@@ -58,7 +56,7 @@ class _FormGeneratorState extends State<FormGenerator> {
           break;
       }
     });
-    print(formValues);
+    print(widget.values);
     super.initState();
   }
 
@@ -99,7 +97,7 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: formValues[_fieldName],
+              initialValue: widget.values[_fieldName],
               autofocus: false,
               onChanged: (String value) {
                 formResults[_fieldName] = value;
@@ -134,7 +132,7 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: formValues[_fieldName],
+              initialValue: widget.values[_fieldName],
               autofocus: false,
               onChanged: (String value) {
                 formResults[_fieldName] = value;
@@ -225,7 +223,7 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: formValues[_fieldName],
+              initialValue: widget.values[_fieldName],
               autofocus: false,
               readOnly: true,
               controller: TextEditingController(text: _dateValueMap[_fieldName]),
