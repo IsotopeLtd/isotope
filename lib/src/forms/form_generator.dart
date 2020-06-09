@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:isotope/src/formatters/credit_card_number_input_formatter.dart';
-import 'package:isotope/src/formatters/date_input_formatter.dart';
-import 'package:isotope/src/formatters/thousands_number_input_formatter.dart';
+import 'package:isotope/formatters.dart';
+import 'package:isotope/src/forms/form_field_types.dart';
 
 class FormGenerator extends StatefulWidget {
   final String schema;
@@ -17,16 +16,16 @@ class FormGenerator extends StatefulWidget {
 }
 
 class _FormGeneratorState extends State<FormGenerator> {
-  final dynamic formItems;
+  final dynamic formFields;
   final Map<String, dynamic> formResults = {};
 
   Map<String, dynamic> _radioValueMap = {};
-  Map<String, String> _dropDownMap = {};
-  Map<String, String> _datevalueMap = {};
+  Map<String, String> _selectValueMap = {};
+  Map<String, String> _dateValueMap = {};
   Map<String, bool> _booleanValueMap = {};
 
   Map _values;
-  _FormGeneratorState(this.formItems);
+  _FormGeneratorState(this.formFields);
 
   @override
   void initState() {
@@ -50,49 +49,49 @@ class _FormGeneratorState extends State<FormGenerator> {
     widget.onChanged(formResults);
   }
 
-  void _updateBooleanMapValue(dynamic item, bool value) {
-    setState(() {
-      _booleanValueMap[item] = value;
-    });
-  }
-
   List<Widget> _buildForm() {
     List<Widget> listWidget = new List<Widget>();
 
-    for (var item in formItems) {
-      if (item['type'] == 'text' ||
-          item['type'] == 'password' ||
-          item['type'] == 'creditcard' ||
-          item['type'] == 'email' ||
-          item['type'] == 'phone' ||
-          item['type'] == 'decimal' ||
-          item['type'] == 'integer') {
+    for (var field in formFields) {
+      String _fieldType = field['type'];
+      String _fieldName = field['name'];
+      String _fieldLabel = field['label'];
+      int _fieldLength = int.tryParse(field['length']);
+      bool _fieldRequired = field['required'] == 'yes' ? true : false;
+
+      if (_fieldType == FormFieldType.TextField || 
+          _fieldType == FormFieldType.PasswordField || 
+          _fieldType == FormFieldType.CreditCardField || 
+          _fieldType == FormFieldType.EmailField || 
+          _fieldType == FormFieldType.PhoneField || 
+          _fieldType == FormFieldType.UrlField || 
+          _fieldType == FormFieldType.DecimalField || 
+          _fieldType == FormFieldType.IntegerField) {
         listWidget.add(
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: _values != null ? _values[item['name']] : null,
+              initialValue: _values != null ? _values[_fieldName] : null,
               autofocus: false,
               onChanged: (String value) {
-                formResults[item['name']] = value;
+                formResults[_fieldName] = value;
                 _handleChanged();
               },
-              inputFormatters: _determineFormatters(item['type'], item['length']),
-              keyboardType: _determineKeyboard(item['type']),
+              inputFormatters: _determineFormatters(_fieldType, _fieldLength),
+              keyboardType: _determineKeyboard(_fieldType),
               validator: (String value) {
-                if (item['required'] == 'no') {
+                if (value.isEmpty && _fieldRequired) {
+                  return '${_fieldName} cannot be empty';
+                }
+                else {
                   return null;
                 }
-                if (value.isEmpty) {
-                  return '${item['name']} cannot be empty';
-                }
-                return null;
               },
               maxLines: 1,
-              obscureText: _determineObscurity(item['type'], item['obscure']),
+              obscureText: _determineObscurity(_fieldType, field['obscure']),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(10, 5, 10, 0),
-                labelText: item['label'],
+                labelText: _fieldLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5.0)
                 ),
@@ -102,33 +101,32 @@ class _FormGeneratorState extends State<FormGenerator> {
         );
       }
 
-      if (item['type'] == 'multiline') {
+      if (_fieldType == FormFieldType.MultilineTextField) {
         listWidget.add(
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: _values != null ? _values[item['name']] : null,
+              initialValue: _values != null ? _values[_fieldName] : null,
               autofocus: false,
               onChanged: (String value) {
-                formResults[item['name']] = value;
+                formResults[_fieldName] = value;
                 _handleChanged();
               },
-              inputFormatters: _determineFormatters(item['type'], item['length']),
-              keyboardType: _determineKeyboard(item['type']),
+              inputFormatters: _determineFormatters(_fieldType, _fieldLength),
+              keyboardType: _determineKeyboard(_fieldType),
               validator: (String value) {
-                if (item['required'] == 'no') {
+                if (value.isEmpty && _fieldRequired) {
+                  return '${_fieldName} cannot be empty';
+                }
+                else {
                   return null;
                 }
-                if (value.isEmpty) {
-                  return '${item['name']} cannot be empty';
-                }
-                return null;
               },
-              maxLines: item['lines'] != null ? int.parse(item['lines']) : 10,
-              obscureText: _determineObscurity(item['type'], item['obscure']),
+              maxLines: _determineMaxLines(field['lines'], 10),
+              obscureText: _determineObscurity(_fieldType, field['obscure']),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                labelText: item['label'],
+                labelText: _fieldLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5.0)
                 ),
@@ -138,9 +136,8 @@ class _FormGeneratorState extends State<FormGenerator> {
         );
       }
 
-      if (item['type'] == 'select') {
-        var newlist = List<String>.from(item['items']);
-
+      if (_fieldType == FormFieldType.SelectField) {
+        var _items = List<String>.from(field['options']);
         listWidget.add(Container(
           margin: EdgeInsets.symmetric(vertical: 10.0),
           child: DropdownButtonFormField<String>(
@@ -150,27 +147,26 @@ class _FormGeneratorState extends State<FormGenerator> {
                 borderRadius: BorderRadius.circular(5.0)
               ),
             ),
-            hint: Text('Select ${item['name']}'),
+            hint: Text('Select ${_fieldName}'),
             validator: (String value) {
-              if (item['required'] == 'no') {
+              if (value == null && _fieldRequired) {
+                return '${_fieldName} cannot be empty';
+              }
+              else {
                 return null;
               }
-              if (value == null) {
-                return '${item['name']} cannot be empty';
-              }
-              return null;
             },
-            value: _dropDownMap[item['name']],
+            value: _selectValueMap[_fieldName],
             isExpanded: true,
             style: Theme.of(context).textTheme.subtitle1,
             onChanged: (String newValue) {
               setState(() {
-                _dropDownMap[item['name']] = newValue;
-                formResults[item['name']] = newValue.trim();
+                _selectValueMap[_fieldName] = newValue;
+                formResults[_fieldName] = newValue.trim();
               });
               _handleChanged();
             },
-            items: newlist.map<DropdownMenuItem<String>>((String value) {
+            items: _items.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
@@ -180,7 +176,7 @@ class _FormGeneratorState extends State<FormGenerator> {
         ));
       }
 
-      if (item['type'] == 'date') {
+      if (_fieldType == FormFieldType.DateField) {
         Future _selectDate() async {
           DateTime picked = await showDatePicker(
             context: context,
@@ -195,7 +191,7 @@ class _FormGeneratorState extends State<FormGenerator> {
             },
           );
           if (picked != null) {
-            setState(() => _datevalueMap[item['name']] = picked.toString().substring(0, 10));
+            setState(() => _dateValueMap[_fieldName] = picked.toString().substring(0, 10));
           }
         }
 
@@ -203,28 +199,30 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: _values != null ? _values[item['name']] : null,
+              initialValue: _values != null ? _values[_fieldName] : null,
               autofocus: false,
               readOnly: true,
-              controller: TextEditingController(text: _datevalueMap[item['name']]),
-              inputFormatters: _determineFormatters(item['type'], null),
+              controller: TextEditingController(text: _dateValueMap[_fieldName]),
+              inputFormatters: _determineFormatters(_fieldType, null),
               validator: (String value) {
-                if (value.isEmpty) {
-                  return '${item['name']} cannot be empty';
+                if (value.isEmpty && _fieldRequired) {
+                  return '${_fieldName} cannot be empty';
                 }
-                return null;
+                else {
+                  return null;
+                }
               },
               onChanged: (String value) {
                 _handleChanged();
               },
               onTap: () async {
                 await _selectDate();
-                formResults[item['name']] = _datevalueMap[item['name']];
+                formResults[_fieldName] = _dateValueMap[_fieldName];
                 _handleChanged();
               },
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                labelText: item['label'],
+                labelText: _fieldLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5.0)
                 ),
@@ -232,67 +230,65 @@ class _FormGeneratorState extends State<FormGenerator> {
                   Icons.calendar_today,
                 ),
               ),
-            )
+            ),
           ),
         );
       }
 
-      if (item['type'] == 'radio') {
-        _radioValueMap["${item['name']}"] =
-            _radioValueMap["${item['name']}"] == null
-                ? 'none'
-                : _radioValueMap["${item['name']}"];
+      if (_fieldType == FormFieldType.RadioField) {
+        _radioValueMap[_fieldName] =
+            _radioValueMap[_fieldName] == null ? 'none' : _radioValueMap[_fieldName];
 
         listWidget.add(
           new Container(
             margin: new EdgeInsets.only(top: 5.0, bottom: 5.0),
             child: new Text(
-              item['label'],
+              _fieldLabel,
               style: new TextStyle(
                 fontWeight: FontWeight.bold, 
                 fontSize: 16.0
-              )
-            )
-          )
+              ),
+            ),
+          ),
         );
 
-        for (var i = 0; i < item['items'].length; i++) {
+        for (var i = 0; i < field['options'].length; i++) {
           listWidget.add(
             new Row(
               children: <Widget>[
-                new Expanded(child: new Text(item['items'][i])),
+                new Expanded(child: new Text(field['options'][i])),
                 new Radio<dynamic>(
-                    // hoverColor: Colors.red,
-                    value: item['items'][i],
-                    groupValue: _radioValueMap["${item['name']}"],
-                    onChanged: (dynamic value) {
-                      setState(() {
-                        _radioValueMap["${item['name']}"] = value;
-                      });
-                      formResults[item['name']] = value;
-                      _handleChanged();
-                    })
+                  value: field['options'][i],
+                  groupValue: _radioValueMap[_fieldName],
+                  onChanged: (dynamic value) {
+                    setState(() {
+                      _radioValueMap[_fieldName] = value;
+                    });
+                    formResults[_fieldName] = value;
+                    _handleChanged();
+                  }
+                )
               ],
             ),
           );
         }
       }
 
-      if (item['type'] == 'checkbox') {
-        if (_booleanValueMap["${item['name']}"] == null) {
+      if (_fieldType == FormFieldType.CheckboxField) {
+        if (_booleanValueMap[_fieldName] == null) {
           setState(() {
-            _booleanValueMap["${item['name']}"] = false;
+            _booleanValueMap[_fieldName] = false;
           });
         }
         listWidget.add(
           Row(
             children: <Widget>[
-              new Expanded(child: new Text(item['label'])),
+              new Expanded(child: new Text(_fieldLabel)),
               Checkbox(
-                value: _booleanValueMap["${item['name']}"],
+                value: _booleanValueMap[_fieldName],
                 onChanged: (bool value) {
-                  _updateBooleanMapValue(item['name'], value);
-                  formResults[item['name']] = value;
+                  _booleanValueMap[_fieldName] = value;
+                  formResults[_fieldName] = value;
                   _handleChanged();
                 }
               ),
@@ -301,21 +297,21 @@ class _FormGeneratorState extends State<FormGenerator> {
         );
       }
 
-      if (item['type'] == 'switch') {
-        if (_booleanValueMap["${item['name']}"] == null) {
+      if (_fieldType == FormFieldType.SwitchField) {
+        if (_booleanValueMap[_fieldName] == null) {
           setState(() {
-            _booleanValueMap["${item['name']}"] = false;
+            _booleanValueMap[_fieldName] = false;
           });
         }
         listWidget.add(
           Row(
             children: <Widget>[
-              new Expanded(child: new Text(item['label'])),
+              new Expanded(child: new Text(_fieldLabel)),
               Switch(
-                value: _booleanValueMap["${item['name']}"],
+                value: _booleanValueMap[_fieldName],
                 onChanged: (bool value) {
-                  _updateBooleanMapValue(item['name'], value);
-                  formResults[item['name']] = value;
+                  _booleanValueMap[_fieldName] = value;
+                  formResults[_fieldName] = value;
                   _handleChanged();
                 }
               ),
@@ -327,86 +323,84 @@ class _FormGeneratorState extends State<FormGenerator> {
     return listWidget;
   }
 
-  List<TextInputFormatter> _determineFormatters(String type, String length) {
+  List<TextInputFormatter> _determineFormatters(String type, int length) {
     List<TextInputFormatter> formatters = new List<TextInputFormatter>();
-    int maxLength;
-
-    if (length != null) {
-      maxLength = int.parse(length);
-    }
-
     switch(type) {
-      case 'integer':
+      case FormFieldType.IntegerField:
         formatters.add(ThousandsNumberInputFormatter());
-        if (maxLength != null) {
-          formatters.add(LengthLimitingTextInputFormatter(maxLength));
+        if (length != null) {
+          formatters.add(LengthLimitingTextInputFormatter(length));
         } 
         break;
-      case 'decimal':
+      case FormFieldType.DecimalField:
         formatters.add(ThousandsNumberInputFormatter(allowFraction: true));
-        if (maxLength != null) {
-          formatters.add(LengthLimitingTextInputFormatter(maxLength));
+        if (length != null) {
+          formatters.add(LengthLimitingTextInputFormatter(length));
         } 
         break;
-      case 'creditcard':
+      case FormFieldType.CreditCardField:
         formatters.add(CreditCardNumberInputFormatter());
         break;
-      case 'date':
+      case FormFieldType.DateField:
         formatters.add(DateInputFormatter());
         break;
-      case 'phone':
+      case FormFieldType.PhoneField:
         formatters.add(WhitelistingTextInputFormatter.digitsOnly);
         break;
       default:
         return null;
     }
-
     return formatters;
   }
 
   TextInputType _determineKeyboard(String type) {
     TextInputType textInputType;
-
     switch(type) {
-      case 'creditcard':
+      case FormFieldType.CreditCardField:
         textInputType = TextInputType.number;
         break;
-      case 'email':
+      case FormFieldType.EmailField:
         textInputType = TextInputType.emailAddress;
         break;
-      case 'multiline':
+      case FormFieldType.MultilineTextField:
         textInputType = TextInputType.multiline;
         break;
-      case 'phone':
+      case FormFieldType.PhoneField:
         textInputType = TextInputType.phone;
         break;
-      case 'url':
+      case FormFieldType.UrlField:
         textInputType = TextInputType.url;
         break;
-      case 'integer':
+      case FormFieldType.IntegerField:
         textInputType = TextInputType.number;
         break;
-      case 'decimal':
+      case FormFieldType.DecimalField:
         textInputType = TextInputType.numberWithOptions(decimal: true);
         break;
-      case 'date':
+      case FormFieldType.DateField:
         textInputType = TextInputType.datetime;
         break;
       default:
         textInputType = null;
         break;
     }
-
     return textInputType;
   }
 
   bool _determineObscurity(String type, String obscure) {
     bool obscurity = false;
-
-    if (type == 'password' || obscure == 'yes') {
+    if (type == FormFieldType.PasswordField || obscure == 'yes') {
       obscurity = true;
     }
-
     return obscurity;
+  }
+
+  int _determineMaxLines(String lines, int defaultMaxLines) {
+    int maxLines = 10;
+    int result = int.tryParse(lines);
+    if (lines != null) {
+      maxLines = result;
+    }
+    return maxLines;
   }
 }

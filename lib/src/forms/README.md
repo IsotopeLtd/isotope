@@ -29,11 +29,12 @@ import 'package:isotope/forms.dart';
 | `text` | Renders a single line text field |
 | `multiline` | Renders a multiline text field (`maxLines` is set to `10`) |
 | `password` | Renders a password text field (`obscureText` is set to `true`) |
-| `creditcard` | Renders a credit card number text field |
-| `email` | Renders a single line email text field |
-| `phone` | Renders a single line email text field |
+| `creditcard` | Renders a credit card number text field (`keyboardType` is set to `TextInputType.number`) |
+| `email` | Renders a single line email text field (`keyboardType` is set to `TextInputType.emailAddress`) |
+| `phone` | Renders a single line phone number field (`keyboardType` is set to `TextInputType.phone`) |
+| `url` | Renders a single line url address field (`keyboardType` is set to `TextInputType.url`) |
 | `integer` | Renders a text field that only accepts integer numbers (`keyboardType` is set to `TextInputType.number`) |
-| `decimal` | Renders a text field that only accepts decimal numbers (`keyboardType` is set to `TextInputType.number`) |
+| `decimal` | Renders a text field that only accepts decimal numbers (`keyboardType` is set to `TextInputType.numberWithOptions`) |
 | `date` | Renders a text field with a button for a modal date selector dialog |
 | `select` | Renders a dropdown select field |
 | `radio` | Renders a vertical list of radio buttons preceded by a label |
@@ -155,6 +156,90 @@ String schema = json.encode([
 ]);
 ```
 
+### Email Field
+
+Configuration:
+
+| Key | Required | Value |
+| --- | --- | --- |
+| `name` | Yes | A name for the field - this is returned in the form response |
+| `label` | No | Text you would like to appear as the placeholder and floating label |
+| `type` | Yes | `email` |
+| `required` | Yes | `yes` or `no` |
+| `length` | No | Sets maxLength property for the TextInputFormatter |
+| `obscure` | No | Sets the obscureText property for the text field |
+
+Example:
+
+```dart
+import 'dart:convert';
+
+String schema = json.encode([
+  {
+    'name': 'email',
+    'type': 'email',
+    'label': 'Your email address',
+    'required': 'yes'
+  },
+]);
+```
+
+### Phone Field
+
+Configuration:
+
+| Key | Required | Value |
+| --- | --- | --- |
+| `name` | Yes | A name for the field - this is returned in the form response |
+| `label` | No | Text you would like to appear as the placeholder and floating label |
+| `type` | Yes | `phone` |
+| `required` | Yes | `yes` or `no` |
+| `length` | No | Sets maxLength property for the TextInputFormatter |
+| `obscure` | No | Sets the obscureText property for the text field |
+
+Example:
+
+```dart
+import 'dart:convert';
+
+String schema = json.encode([
+  {
+    'name': 'phone',
+    'type': 'phone',
+    'label': 'Your phone number',
+    'required': 'no'
+  },
+]);
+```
+
+### URL Field
+
+Configuration:
+
+| Key | Required | Value |
+| --- | --- | --- |
+| `name` | Yes | A name for the field - this is returned in the form response |
+| `label` | No | Text you would like to appear as the placeholder and floating label |
+| `type` | Yes | `url` |
+| `required` | Yes | `yes` or `no` |
+| `length` | No | Sets maxLength property for the TextInputFormatter |
+| `obscure` | No | Sets the obscureText property for the text field |
+
+Example:
+
+```dart
+import 'dart:convert';
+
+String schema = json.encode([
+  {
+    'name': 'url',
+    'type': 'url',
+    'label': 'Your web site address',
+    'required': 'no'
+  },
+]);
+```
+
 ### Integer Field
 
 Configuration:
@@ -243,7 +328,7 @@ Configuration:
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `select` |
 | `required` | Yes | `yes` or `no` |
-| `items` | Yes | An array of string values, see example below |
+| `options` | Yes | An array of string values, see example below |
 
 Example:
 
@@ -256,7 +341,7 @@ String schema = json.encode([
     'type': 'select',
     'label': 'Your age group',
     'required': 'no',
-    'items': ['1-20', '21-30', '31-40', '41-50', '51-60']
+    'options': ['1-20', '21-30', '31-40', '41-50', '51-60']
   },
 ]);
 ```
@@ -271,7 +356,7 @@ Configuration:
 | `type` | Yes | `radio` |
 | `label` | Yes | Text you would like to appear as the options list label |
 | `required` | Yes | `yes` or `no` |
-| `items` | Yes | An array of string values, see example below |
+| `options` | Yes | An array of string values, see example below |
 
 Example:
 
@@ -284,7 +369,7 @@ String schema = json.encode([
     'type': 'radio',
     'label': 'Your favorite color',
     'required': 'no',
-    'items': ['red', 'green', 'blue'],
+    'options': ['red', 'green', 'blue'],
   },
 ]);
 ```
