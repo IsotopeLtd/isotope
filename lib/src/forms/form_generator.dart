@@ -18,19 +18,46 @@ class FormGenerator extends StatefulWidget {
 class _FormGeneratorState extends State<FormGenerator> {
   final dynamic formFields;
   final Map<String, dynamic> formResults = {};
+  final Map<String, dynamic> formValues = {};
 
   Map<String, dynamic> _radioValueMap = {};
   Map<String, String> _selectValueMap = {};
   Map<String, String> _dateValueMap = {};
   Map<String, bool> _booleanValueMap = {};
 
-  Map _values;
   _FormGeneratorState(this.formFields);
 
   @override
   void initState() {
-    _values = widget.values;
-    print(_values);
+    formValues.addAll(widget.values);
+    formValues.forEach((key, value) {
+      switch(formFields[key]) {
+        case FormFieldType.CheckboxField:
+          if (value.toString().toLowerCase() == 'yes') {
+            _booleanValueMap[key] = true;
+          } else {
+            _booleanValueMap[key] = false;
+          }
+          break;
+        case FormFieldType.DateField:
+          _dateValueMap[key] = value;
+          break;
+        case FormFieldType.RadioField:
+          _radioValueMap[key] = value;
+          break;
+        case FormFieldType.SelectField:
+          _selectValueMap[key] = value;
+          break;
+        case FormFieldType.SwitchField:
+          if (value.toString().toLowerCase() == 'yes') {
+            _booleanValueMap[key] = true;
+          } else {
+            _booleanValueMap[key] = false;
+          }
+          break;
+      }
+    });
+    print(formValues);
     super.initState();
   }
 
@@ -71,7 +98,7 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: _values != null ? _values[_fieldName] : null,
+              initialValue: formValues[_fieldName],
               autofocus: false,
               onChanged: (String value) {
                 formResults[_fieldName] = value;
@@ -106,7 +133,7 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: _values != null ? _values[_fieldName] : null,
+              initialValue: formValues[_fieldName],
               autofocus: false,
               onChanged: (String value) {
                 formResults[_fieldName] = value;
@@ -117,8 +144,7 @@ class _FormGeneratorState extends State<FormGenerator> {
               validator: (String value) {
                 if (value.isEmpty && _fieldRequired) {
                   return '${_fieldName} cannot be empty';
-                }
-                else {
+                } else {
                   return null;
                 }
               },
@@ -151,8 +177,7 @@ class _FormGeneratorState extends State<FormGenerator> {
             validator: (String value) {
               if (value == null && _fieldRequired) {
                 return '${_fieldName} cannot be empty';
-              }
-              else {
+              } else {
                 return null;
               }
             },
@@ -199,7 +224,7 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: _values != null ? _values[_fieldName] : null,
+              initialValue: formValues[_fieldName],
               autofocus: false,
               readOnly: true,
               controller: TextEditingController(text: _dateValueMap[_fieldName]),
@@ -207,8 +232,7 @@ class _FormGeneratorState extends State<FormGenerator> {
               validator: (String value) {
                 if (value.isEmpty && _fieldRequired) {
                   return '${_fieldName} cannot be empty';
-                }
-                else {
+                } else {
                   return null;
                 }
               },
@@ -382,7 +406,6 @@ class _FormGeneratorState extends State<FormGenerator> {
         break;
       default:
         textInputType = null;
-        break;
     }
     return textInputType;
   }
