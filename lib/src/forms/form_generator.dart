@@ -18,7 +18,7 @@ class FormGenerator extends StatefulWidget {
 class _FormGeneratorState extends State<FormGenerator> {
   final dynamic formFields;
   final Map<String, dynamic> formResults = {};
-  final Map<String, dynamic> formValues = {};
+  final Map<String, dynamic> formValues = new Map<String, bool>();
 
   Map<String, dynamic> _radioValueMap = {};
   Map<String, String> _selectValueMap = {};
