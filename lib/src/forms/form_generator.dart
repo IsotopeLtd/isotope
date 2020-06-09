@@ -31,7 +31,8 @@ class _FormGeneratorState extends State<FormGenerator> {
   void initState() {
     formValues.addAll(widget.values);
     formValues.forEach((key, value) {
-      switch(formFields[key]) {
+      var field = formFields[key];
+      switch(field['type']) {
         case FormFieldType.CheckboxField:
           if (value.toString().toLowerCase() == 'yes') {
             _booleanValueMap[key] = true;
