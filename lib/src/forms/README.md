@@ -50,7 +50,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `text` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `length` | No | Sets maxLength property for the TextInputFormatter |
 | `obscure` | No | Sets the obscureText property for the text field |
 
@@ -64,7 +64,7 @@ String schema = json.encode([
     'name': 'Name',
     'type': 'text',
     'label': 'Your full name',
-    'required': 'yes',
+    'required': 'true',
     'length': '40'
   },
 ]);
@@ -79,7 +79,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `multiline` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `length` | No | Sets maxLength property for the TextInputFormatter |
 | `lines` | No | Sets the maxLines property for the text field - defaults to 10 |
 | `obscure` | No | Sets the obscureText property for the text field |
@@ -94,7 +94,7 @@ String schema = json.encode([
     'name': 'bio',
     'type': 'multiline',
     'label': 'A short bio',
-    'required': 'no',
+    'required': 'false',
     'length': '300',
     'lines': '5'
   },
@@ -110,7 +110,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `password` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `length` | No | Sets maxLength property for the TextInputFormatter |
 
 Example:
@@ -123,7 +123,7 @@ String schema = json.encode([
     'name': 'pwd',
     'type': 'password',
     'label': 'Your password',
-    'required': 'yes'
+    'required': 'true'
   },
 ]);
 ```
@@ -137,7 +137,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `creditcard` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `length` | No | Sets maxLength property for the TextInputFormatter |
 | `obscure` | No | Sets the obscureText property for the text field |
 
@@ -151,7 +151,7 @@ String schema = json.encode([
     'name': 'creditcard',
     'type': 'creditcard',
     'label': 'Credit card number',
-    'required': 'yes'
+    'required': 'true'
   },
 ]);
 ```
@@ -165,7 +165,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `email` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `length` | No | Sets maxLength property for the TextInputFormatter |
 | `obscure` | No | Sets the obscureText property for the text field |
 
@@ -179,7 +179,7 @@ String schema = json.encode([
     'name': 'email',
     'type': 'email',
     'label': 'Your email address',
-    'required': 'yes'
+    'required': 'true'
   },
 ]);
 ```
@@ -193,7 +193,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `phone` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `length` | No | Sets maxLength property for the TextInputFormatter |
 | `obscure` | No | Sets the obscureText property for the text field |
 
@@ -207,7 +207,7 @@ String schema = json.encode([
     'name': 'phone',
     'type': 'phone',
     'label': 'Your phone number',
-    'required': 'no'
+    'required': 'false'
   },
 ]);
 ```
@@ -221,7 +221,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `url` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `length` | No | Sets maxLength property for the TextInputFormatter |
 | `obscure` | No | Sets the obscureText property for the text field |
 
@@ -235,7 +235,7 @@ String schema = json.encode([
     'name': 'url',
     'type': 'url',
     'label': 'Your web site address',
-    'required': 'no'
+    'required': 'false'
   },
 ]);
 ```
@@ -249,7 +249,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `integer` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 
 Example:
 
@@ -261,7 +261,7 @@ String schema = json.encode([
     'name': 'engines',
     'type': 'integer',
     'label': 'Number of engines',
-    'required': 'no'
+    'required': 'false'
   },
 ]);
 ```
@@ -275,7 +275,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `integer` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 
 Example:
 
@@ -287,7 +287,7 @@ String schema = json.encode([
     'name': 'price',
     'type': 'decimal',
     'label': 'Price of engine',
-    'required': 'yes'
+    'required': 'true'
   },
 ]);
 ```
@@ -301,7 +301,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `date` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 
 Example:
 
@@ -313,7 +313,7 @@ String schema = json.encode([
     'name': 'dob',
     'type': 'date',
     'label': 'Date of birth',
-    'required': 'yes'
+    'required': 'true'
   },
 ]);
 ```
@@ -327,7 +327,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `label` | No | Text you would like to appear as the placeholder and floating label |
 | `type` | Yes | `select` |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `options` | Yes | An array of string values, see example below |
 
 Example:
@@ -340,7 +340,7 @@ String schema = json.encode([
     'name': 'ageGroup',
     'type': 'select',
     'label': 'Your age group',
-    'required': 'no',
+    'required': 'false',
     'options': ['1-20', '21-30', '31-40', '41-50', '51-60']
   },
 ]);
@@ -355,7 +355,7 @@ Configuration:
 | `name` | Yes | A name for the field - this is returned in the form response |
 | `type` | Yes | `radio` |
 | `label` | Yes | Text you would like to appear as the options list label |
-| `required` | Yes | `yes` or `no` |
+| `required` | Yes | `true` or `false` |
 | `options` | Yes | An array of string values, see example below |
 
 Example:
@@ -368,7 +368,7 @@ String schema = json.encode([
     'name': 'color',
     'type': 'radio',
     'label': 'Your favorite color',
-    'required': 'no',
+    'required': 'false',
     'options': ['red', 'green', 'blue'],
   },
 ]);
@@ -451,19 +451,19 @@ class _DynamicFormState extends State<DynamicForm> {
       'name': 'Name',
       'type': 'text',
       'label': 'Your full name',
-      'required': 'yes',
+      'required': 'true',
       'length': '40',
     },
     {
       'name': 'dob',
       'type': 'date',
       'label': 'Date of birth',
-      'required': 'yes',
+      'required': 'true',
     },
   ]);
 
   // Define some default initial values as a Map:
-  Map _values = { 
+  Map<String, dynamic> _values = { 
     'name': 'Fred Flintstone', 
     'dob': '1970-02-01', 
   }

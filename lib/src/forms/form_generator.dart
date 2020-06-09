@@ -7,7 +7,7 @@ import 'package:isotope/src/forms/form_field_types.dart';
 class FormGenerator extends StatefulWidget {
   final String schema;
   final ValueChanged<Map> onChanged;
-  final Map values;
+  final Map<String, dynamic> values;
 
   FormGenerator({@required this.schema, @required this.onChanged, this.values});
 
@@ -16,47 +16,43 @@ class FormGenerator extends StatefulWidget {
 }
 
 class _FormGeneratorState extends State<FormGenerator> {
-  final dynamic formFields;
-  final Map<String, dynamic> formResults = {};
+  final dynamic fields;
+  Map<String, dynamic> values = {};
 
-  Map<String, dynamic> _radioValueMap = {};
-  Map<String, String> _selectValueMap = {};
-  Map<String, String> _dateValueMap = {};
-  Map<String, bool> _booleanValueMap = {};
-
-  _FormGeneratorState(this.formFields);
+  _FormGeneratorState(this.fields);
 
   @override
   void initState() {
-    widget.values.forEach((key, value) {
-      var field = formFields[key];
+    values = widget.values;
+    print(values);
+    values.forEach((key, value) {
+      var field = _findField(key, fields);
       switch(field['type']) {
         case FormFieldType.CheckboxField:
-          if (value.toString().toLowerCase() == 'yes') {
-            _booleanValueMap[key] = true;
+          if (value.toString().toLowerCase() == 'true') {
+            values[key] = true;
           } else {
-            _booleanValueMap[key] = false;
+            values[key] = false;
           }
           break;
         case FormFieldType.DateField:
-          _dateValueMap[key] = value;
+          values[key] = value;
           break;
         case FormFieldType.RadioField:
-          _radioValueMap[key] = value;
+          values[key] = value;
           break;
         case FormFieldType.SelectField:
-          _selectValueMap[key] = value;
+          values[key] = value;
           break;
         case FormFieldType.SwitchField:
-          if (value.toString().toLowerCase() == 'yes') {
-            _booleanValueMap[key] = true;
+          if (value.toString().toLowerCase() == 'true') {
+            values[key] = true;
           } else {
-            _booleanValueMap[key] = false;
+            values[key] = false;
           }
           break;
       }
     });
-    print(widget.values);
     super.initState();
   }
 
@@ -72,18 +68,18 @@ class _FormGeneratorState extends State<FormGenerator> {
   }
 
   void _handleChanged() {
-    widget.onChanged(formResults);
+    widget.onChanged(values);
   }
 
   List<Widget> _buildForm() {
     List<Widget> listWidget = new List<Widget>();
 
-    for (var field in formFields) {
+    for (var field in fields) {
       String _fieldType = field['type'];
       String _fieldName = field['name'];
       String _fieldLabel = field['label'];
-      int _fieldLength = int.tryParse(field['length']);
-      bool _fieldRequired = field['required'] == 'yes' ? true : false;
+      int _fieldLength = field['length'] != null ? int.tryParse(field['length']) : null;
+      bool _fieldRequired = field['required'] == 'true' ? true : false;
 
       if (_fieldType == FormFieldType.TextField || 
           _fieldType == FormFieldType.PasswordField || 
@@ -97,17 +93,17 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: widget.values[_fieldName],
+              initialValue: values[_fieldName],
               autofocus: false,
               onChanged: (String value) {
-                formResults[_fieldName] = value;
+                values[_fieldName] = value;
                 _handleChanged();
               },
               inputFormatters: _determineFormatters(_fieldType, _fieldLength),
               keyboardType: _determineKeyboard(_fieldType),
               validator: (String value) {
                 if (value.isEmpty && _fieldRequired) {
-                  return '${_fieldName} cannot be empty';
+                  return '$_fieldName cannot be empty';
                 }
                 else {
                   return null;
@@ -132,17 +128,17 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: widget.values[_fieldName],
+              initialValue: values[_fieldName],
               autofocus: false,
               onChanged: (String value) {
-                formResults[_fieldName] = value;
+                values[_fieldName] = value;
                 _handleChanged();
               },
               inputFormatters: _determineFormatters(_fieldType, _fieldLength),
               keyboardType: _determineKeyboard(_fieldType),
               validator: (String value) {
                 if (value.isEmpty && _fieldRequired) {
-                  return '${_fieldName} cannot be empty';
+                  return '$_fieldName cannot be empty';
                 } else {
                   return null;
                 }
@@ -172,21 +168,20 @@ class _FormGeneratorState extends State<FormGenerator> {
                 borderRadius: BorderRadius.circular(5.0)
               ),
             ),
-            hint: Text('Select ${_fieldName}'),
+            hint: Text('Select $_fieldName'),
             validator: (String value) {
               if (value == null && _fieldRequired) {
-                return '${_fieldName} cannot be empty';
+                return '$_fieldName cannot be empty';
               } else {
                 return null;
               }
             },
-            value: _selectValueMap[_fieldName],
+            value: values[_fieldName],
             isExpanded: true,
             style: Theme.of(context).textTheme.subtitle1,
             onChanged: (String newValue) {
               setState(() {
-                _selectValueMap[_fieldName] = newValue;
-                formResults[_fieldName] = newValue.trim();
+                values[_fieldName] = newValue.trim();
               });
               _handleChanged();
             },
@@ -215,7 +210,7 @@ class _FormGeneratorState extends State<FormGenerator> {
             },
           );
           if (picked != null) {
-            setState(() => _dateValueMap[_fieldName] = picked.toString().substring(0, 10));
+            setState(() => values[_fieldName] = picked.toString().substring(0, 10));
           }
         }
 
@@ -223,14 +218,14 @@ class _FormGeneratorState extends State<FormGenerator> {
           Container(
             margin: EdgeInsets.symmetric(vertical: 10.0),
             child: TextFormField(
-              initialValue: widget.values[_fieldName],
+              initialValue: values[_fieldName],
               autofocus: false,
               readOnly: true,
-              controller: TextEditingController(text: _dateValueMap[_fieldName]),
+              controller: TextEditingController(text: values[_fieldName]),
               inputFormatters: _determineFormatters(_fieldType, null),
               validator: (String value) {
                 if (value.isEmpty && _fieldRequired) {
-                  return '${_fieldName} cannot be empty';
+                  return '$_fieldName cannot be empty';
                 } else {
                   return null;
                 }
@@ -240,7 +235,6 @@ class _FormGeneratorState extends State<FormGenerator> {
               },
               onTap: () async {
                 await _selectDate();
-                formResults[_fieldName] = _dateValueMap[_fieldName];
                 _handleChanged();
               },
               decoration: InputDecoration(
@@ -259,8 +253,9 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
 
       if (_fieldType == FormFieldType.RadioField) {
-        _radioValueMap[_fieldName] =
-            _radioValueMap[_fieldName] == null ? 'none' : _radioValueMap[_fieldName];
+        // if (values[_fieldName] == null) {
+        //   values[_fieldName] = 'none';
+        // }
 
         listWidget.add(
           new Container(
@@ -282,12 +277,11 @@ class _FormGeneratorState extends State<FormGenerator> {
                 new Expanded(child: new Text(field['options'][i])),
                 new Radio<dynamic>(
                   value: field['options'][i],
-                  groupValue: _radioValueMap[_fieldName],
+                  groupValue: values[_fieldName],
                   onChanged: (dynamic value) {
                     setState(() {
-                      _radioValueMap[_fieldName] = value;
+                      values[_fieldName] = value;
                     });
-                    formResults[_fieldName] = value;
                     _handleChanged();
                   }
                 )
@@ -298,9 +292,9 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
 
       if (_fieldType == FormFieldType.CheckboxField) {
-        if (_booleanValueMap[_fieldName] == null) {
+        if (values[_fieldName] == null) {
           setState(() {
-            _booleanValueMap[_fieldName] = false;
+            values[_fieldName] = false;
           });
         }
         listWidget.add(
@@ -308,10 +302,9 @@ class _FormGeneratorState extends State<FormGenerator> {
             children: <Widget>[
               new Expanded(child: new Text(_fieldLabel)),
               Checkbox(
-                value: _booleanValueMap[_fieldName],
+                value: values[_fieldName],
                 onChanged: (bool value) {
-                  _booleanValueMap[_fieldName] = value;
-                  formResults[_fieldName] = value;
+                  values[_fieldName] = value;
                   _handleChanged();
                 }
               ),
@@ -321,9 +314,9 @@ class _FormGeneratorState extends State<FormGenerator> {
       }
 
       if (_fieldType == FormFieldType.SwitchField) {
-        if (_booleanValueMap[_fieldName] == null) {
+        if (values[_fieldName] == null) {
           setState(() {
-            _booleanValueMap[_fieldName] = false;
+            values[_fieldName] = false;
           });
         }
         listWidget.add(
@@ -331,10 +324,9 @@ class _FormGeneratorState extends State<FormGenerator> {
             children: <Widget>[
               new Expanded(child: new Text(_fieldLabel)),
               Switch(
-                value: _booleanValueMap[_fieldName],
+                value: values[_fieldName],
                 onChanged: (bool value) {
-                  _booleanValueMap[_fieldName] = value;
-                  formResults[_fieldName] = value;
+                  values[_fieldName] = value;
                   _handleChanged();
                 }
               ),
@@ -424,5 +416,14 @@ class _FormGeneratorState extends State<FormGenerator> {
       maxLines = result;
     }
     return maxLines;
+  }
+
+  Map _findField(String name, dynamic fieldsObj) {
+    for (var field in fieldsObj) {
+      if (field['name'] == name) {
+        return field;
+      }
+    }
+    return null;
   }
 }
