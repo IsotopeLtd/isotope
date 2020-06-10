@@ -19,6 +19,8 @@ Add the following to your `pubspec.yaml`:
 
 ```dart
 dependencies:
+  flutter_localizations:
+    sdk: flutter
   isotope:
     git: git://github.com/IsotopeLtd/isotope.git
     version: 1.0.0
