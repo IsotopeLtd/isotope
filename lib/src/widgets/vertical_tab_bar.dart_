@@ -1,0 +1,47 @@
+import 'package:flutter/material.dart';
+
+class VerticalTabBar extends StatefulWidget {
+  VerticalTabBar({Key key}) : super(key: key);
+
+  @override
+  _VerticalTabBarState createState() => _VerticalTabBarState();
+}
+
+class _VerticalTabBarState extends State<VerticalTabBar> {
+  double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+       child: SingleChildScrollView(
+         child: ListView.builder(
+            itemCount: assets.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                leading: iconWithShadow(
+                  Icons.fiber_smart_record, 
+                  color: ColorConverter.colorFromName(assets[index].name.toLowerCase()), 
+                  size: 42,
+                ),
+                title: Text('${assets[index].name} (${assets[index].symbol})', style: AppTheme.title),
+                subtitle: Text('${assets[index].quantity} ${assets[index].unit}s at ${Money.from(assets[index].price, audCurrency).toString()}/${assets[index].unit}'),
+                trailing: Text('${Money.from((assets[index].price * assets[index].quantity), audCurrency).toString()}', style: AppTheme.title),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AssetDetail(asset: assets[index]),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+    );
+  }
+}
+
+class VerticalTabBarItem {
+  
+}
