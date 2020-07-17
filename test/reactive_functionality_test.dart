@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isotope/reactive.dart';
-import 'package:isotope/src/presenters/reactive_service_mixin.dart';
+import 'package:isotope/presenters.dart';
 
 class CounterService with ReactiveServiceMixin {
   ReactiveValue<int> _counter = ReactiveValue<int>(initial: 0);
@@ -42,7 +42,8 @@ class MultipleCounterService with ReactiveServiceMixin {
 
 void main() {
   group('Reactive Functionality', () {
-    test('When ReactiveValue updates on reactive service, should call listeners',
+    test(
+        'When ReactiveValue updates on reactive service, should call listeners',
         () async {
       var called = false;
       var reactiveService = CounterService();

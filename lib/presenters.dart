@@ -1,5 +1,6 @@
 library presenters;
 
+export 'src/presenters/hook_presenter_widget.dart';
 export 'src/presenters/presenter.dart';
 export 'src/presenters/presenter_widget.dart';
 export 'src/presenters/reactive_service_mixin.dart';
