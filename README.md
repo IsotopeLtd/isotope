@@ -9,7 +9,7 @@ Add the following dependencies to your `pubspec.yaml`:
 ```dart
 dependences:
   isotope:
-    git: git://github.com/isotopeltd/isotope.git
+    git: git://github.com/IsotopeVentures/isotope.git
 ```
 
 ## Implementation
@@ -45,4 +45,5 @@ This library is available as open source under the terms of the MIT License.
 
 ## Copyright
 
-Copyright © 2020 Jurgen Jocubeit
+Copyright © 2020 Jurgen Jocubeit & Isotope Ventures Pty Ltd.
+All rights reserved.
