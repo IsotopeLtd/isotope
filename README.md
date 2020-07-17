@@ -24,8 +24,8 @@ Alternatively, import just the libraries you're interested in:
 
 ```dart
 import 'package:isotope/extensions.dart';
+import 'package:isotope/formatters.dart';
 import 'package:isotope/forms.dart';
-import 'package:isotope/hooks.dart';
 import 'package:isotope/localization.dart';
 import 'package:isotope/models.dart';
 import 'package:isotope/notifier.dart';
