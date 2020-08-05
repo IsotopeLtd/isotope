@@ -57,10 +57,12 @@ class _JsonFormState extends State<JsonForm> {
           inputFormatters: item['validator'] != null && item['validator'] != ''
               ? [
                   item['validator'] == 'digitsOnly'
-                      ? WhitelistingTextInputFormatter(RegExp('[0-9]'))
+                      ? FilteringTextInputFormatter(RegExp('[0-9]'),
+                          allow: true)
                       : null,
                   item['validator'] == 'textOnly'
-                      ? WhitelistingTextInputFormatter(RegExp('[a-zA-Z]'))
+                      ? FilteringTextInputFormatter(RegExp('[a-zA-Z]'),
+                          allow: true)
                       : null,
                 ]
               : null,

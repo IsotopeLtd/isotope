@@ -7,8 +7,8 @@ import 'package:isotope/src/formatters/number_input_formatter.dart';
 /// `12345678` should be formatted to `1234 5678`.
 class CreditCardNumberInputFormatter extends NumberInputFormatter {
   static final RegExp _digitOnlyRegex = RegExp(r'\d+');
-  static final WhitelistingTextInputFormatter _digitOnlyFormatter = 
-      WhitelistingTextInputFormatter(_digitOnlyRegex);
+  static final FilteringTextInputFormatter _digitOnlyFormatter =
+      FilteringTextInputFormatter(_digitOnlyRegex, allow: true);
 
   final String separator;
 
@@ -19,27 +19,25 @@ class CreditCardNumberInputFormatter extends NumberInputFormatter {
     StringBuffer buffer = StringBuffer();
     int offset = 0;
     int count = min(4, digits.length);
-    
+
     final length = digits.length;
 
     for (; count <= length; count += min(4, max(1, length - count))) {
       buffer.write(digits.substring(offset, count));
-      
+
       if (count < length) {
         buffer.write(separator);
       }
-      
+
       offset = count;
     }
-    
+
     return buffer.toString();
   }
 
   @override
   TextEditingValue formatValue(
-    TextEditingValue oldValue, 
-    TextEditingValue newValue
-  ) {
+      TextEditingValue oldValue, TextEditingValue newValue) {
     return _digitOnlyFormatter.formatEditUpdate(oldValue, newValue);
   }
 

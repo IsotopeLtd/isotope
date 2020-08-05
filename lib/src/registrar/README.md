@@ -1,6 +1,6 @@
 # Registrar
 
-This is a simple **Service Locator** for Dart and Flutter projects with some additional goodies highly inspired by [Splat](https://github.com/reactiveui/splat). It can be used instead of `InheritedWidget` or `Provider` to access objects e.g. from your UI.
+Registrar is a simple service registry for Dart and Flutter projects with some additional functionality highly inspired by [Splat](https://github.com/reactiveui/splat). It can be used instead of `InheritedWidget` or `Provider` to access objects e.g. from your UI.
 
 Typical usage:
 * Accessing service objects like REST API clients, databases so that they easily can be mocked.
@@ -29,7 +29,7 @@ Registrar is:
 * Easy to learn/use
 * Doesn't clutter your UI tree with special widgets to access your data like provider or redux does.
 
-**Registrar isn't a state management solution!** It's a locator for your objects so you need some other way to notify your UI about changes like `Streams` or `ValueNotifiers`.
+**Registrar isn't a state management solution!** It's a registry for your objects so you need some other way to notify your UI about changes like `Streams` or `ValueNotifiers`.
 
 ## Installation
 
@@ -79,7 +79,7 @@ Although the approach with a global variable worked well, it has its limitations
 Registrar registrar = Registrar.instance;
 ```
 
-Through this any call to `instance` in any package of a project will get the same instance of `Registrar`. I still recommend just to assign the instance to a global variable in your project as it is more convenient and doesn't harm (also it allows you to give your service locator your own name).
+Through this any call to `instance` in any package of a project will get the same instance of `Registrar`. I still recommend just to assign the instance to a global variable in your project as it is more convenient and doesn't harm (also it allows you to give your service registry your own name).
 
 
 ```Dart

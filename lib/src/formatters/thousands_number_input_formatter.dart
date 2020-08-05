@@ -8,7 +8,7 @@ import 'package:isotope/src/formatters/number_input_formatter.dart';
 class ThousandsNumberInputFormatter extends NumberInputFormatter {
   static final NumberFormat _formatter = NumberFormat.decimalPattern();
 
-  final WhitelistingTextInputFormatter _decimalFormatter;
+  final FilteringTextInputFormatter _decimalFormatter;
   final String _decimalSeparator;
   final RegExp _decimalRegex;
 
@@ -20,9 +20,11 @@ class ThousandsNumberInputFormatter extends NumberInputFormatter {
         _decimalRegex = RegExp(allowFraction
             ? '[0-9]+([${(formatter ?? _formatter).symbols.DECIMAL_SEP}])?'
             : r'\d+'),
-        _decimalFormatter = WhitelistingTextInputFormatter(RegExp(allowFraction
-            ? '[0-9]+([${(formatter ?? _formatter).symbols.DECIMAL_SEP}])?'
-            : r'\d+'));
+        _decimalFormatter = FilteringTextInputFormatter(
+            RegExp(allowFraction
+                ? '[0-9]+([${(formatter ?? _formatter).symbols.DECIMAL_SEP}])?'
+                : r'\d+'),
+            allow: true);
 
   @override
   String formatPattern(String digits) {
